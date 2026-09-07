@@ -20,6 +20,12 @@ function shadeColor(colorHex: string, percent: number): string {
 export function renderPieChart3D(rc: RenderContext) {
   const { ctx, width, height, progress, config } = rc;
 
+  // Always reset shadow at start of render to prevent any bleeding
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
   const defaultItems = [
     { id: '1', label: 'Product & AI', value: 42, color: '#6366f1' },
     { id: '2', label: 'Marketing', value: 28, color: '#38bdf8' },
@@ -31,14 +37,16 @@ export function renderPieChart3D(rc: RenderContext) {
   const totalValue = items.reduce((acc, it) => acc + (it.value || 0), 0) || 100;
 
   const scale = width / 1920;
-  const cardWidth = 1200 * scale;
-  const cardHeight = 650 * scale;
+
+  // Full-screen card taking up 92% of width and height for high-impact presence
+  const cardWidth = width * 0.92;
+  const cardHeight = height * 0.88;
   const cardX = (width - cardWidth) / 2;
   const cardY = (height - cardHeight) / 2;
 
-  // 1. Entrance animation (card scale and fade)
-  const cardEntrance = windowProgress(progress, 0, 0.25, Easing.easeOutBack);
-  const cardAlpha = windowProgress(progress, 0, 0.2, Easing.easeOutQuad);
+  // Entrance animation
+  const cardEntrance = windowProgress(progress, 0, 0.22, Easing.easeOutCubic);
+  const cardAlpha = windowProgress(progress, 0, 0.18, Easing.easeOutQuad);
 
   ctx.save();
   ctx.translate(width / 2, height / 2);
@@ -46,47 +54,59 @@ export function renderPieChart3D(rc: RenderContext) {
   ctx.translate(-width / 2, -height / 2);
   ctx.globalAlpha = cardAlpha;
 
-  // Background Glass Card
-  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 30 * scale);
-  ctx.fillStyle = config.cardColor || 'rgba(15, 23, 42, 0.94)';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-  ctx.shadowBlur = 42 * scale;
-  ctx.shadowOffsetY = 18 * scale;
+  // 1. Background Card (Clean, subtle shadow without text ghosting)
+  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 32 * scale);
+  ctx.fillStyle = config.cardColor || 'rgba(15, 23, 42, 0.95)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 24 * scale;
+  ctx.shadowOffsetY = 10 * scale;
+  ctx.shadowOffsetX = 0;
   ctx.fill();
 
-  // Border glow
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1.5 * scale;
+  // Reset shadow immediately after card fill!
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Card Border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+  ctx.lineWidth = 2 * scale;
   ctx.stroke();
 
-  // Title & Subtitle Header
+  // 2. Crisp Header Title & Subtitle (Zero shadow blur for maximum sharpness)
   const titleAlpha = windowProgress(progress, 0.1, 0.35, Easing.easeOutCubic);
   ctx.save();
   ctx.globalAlpha = titleAlpha;
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
   ctx.fillStyle = config.textColor || '#ffffff';
-  ctx.font = `bold ${34 * scale}px system-ui, -apple-system, sans-serif`;
+  ctx.font = `bold ${44 * scale}px system-ui, -apple-system, sans-serif`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.shadowBlur = 0;
-  ctx.fillText(config.title, cardX + 54 * scale, cardY + 44 * scale);
+  ctx.fillText(config.title, cardX + 64 * scale, cardY + 52 * scale);
 
-  ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
-  ctx.font = `500 ${20 * scale}px system-ui, -apple-system, sans-serif`;
-  ctx.fillText(config.subtitle, cardX + 54 * scale, cardY + 88 * scale);
+  ctx.fillStyle = 'rgba(148, 163, 184, 0.95)';
+  ctx.font = `500 ${24 * scale}px system-ui, -apple-system, sans-serif`;
+  ctx.fillText(config.subtitle, cardX + 64 * scale, cardY + 110 * scale);
 
+  // Badge Tag
   if (config.badgeText) {
     const badgeText = config.badgeText;
-    ctx.font = `bold ${16 * scale}px system-ui, -apple-system, sans-serif`;
-    const bw = ctx.measureText(badgeText).width + 24 * scale;
-    const bh = 32 * scale;
-    const bx = cardX + cardWidth - 54 * scale - bw;
-    const by = cardY + 48 * scale;
+    ctx.font = `bold ${18 * scale}px system-ui, -apple-system, sans-serif`;
+    const bw = ctx.measureText(badgeText).width + 32 * scale;
+    const bh = 38 * scale;
+    const bx = cardX + cardWidth - 64 * scale - bw;
+    const by = cardY + 56 * scale;
 
-    roundRect(ctx, bx, by, bw, bh, 16 * scale);
+    roundRect(ctx, bx, by, bw, bh, 19 * scale);
     ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
     ctx.fill();
     ctx.strokeStyle = config.primaryColor || '#6366f1';
-    ctx.lineWidth = 1 * scale;
+    ctx.lineWidth = 1.5 * scale;
     ctx.stroke();
 
     ctx.fillStyle = config.primaryColor || '#818cf8';
@@ -96,19 +116,17 @@ export function renderPieChart3D(rc: RenderContext) {
   }
   ctx.restore();
 
-  // 3D Pie Geometry
-  // Position pie towards center-left, legend on right
-  const pieCenterX = cardX + cardWidth * 0.38;
+  // 3. 3D Pie Geometry (Much larger, immersive size)
+  const pieCenterX = cardX + cardWidth * 0.36;
   const pieCenterY = cardY + cardHeight * 0.58;
-  const rx = 210 * scale; // horizontal radius
-  const ry = 115 * scale; // vertical radius (isometric tilt ~ 0.55 ratio)
-  const depth = 45 * scale; // 3D extrusion thickness
+  const rx = 320 * scale; // Increased from 210 -> 320 for full screen impact!
+  const ry = 175 * scale; // Vertical radius
+  const depth = 65 * scale; // 3D extrusion thickness
 
-  // Rotation animation (starts at -120deg and spins smoothly into position)
-  const animProgress = windowProgress(progress, 0.2, 0.85, Easing.easeOutCubic);
+  // Rotation animation
+  const animProgress = windowProgress(progress, 0.15, 0.85, Easing.easeOutCubic);
   const baseRotation = lerp(-Math.PI * 0.75, -Math.PI * 0.5, animProgress);
 
-  // Compute angles for each slice
   const palette = [
     config.primaryColor || '#6366f1',
     config.secondaryColor || '#38bdf8',
@@ -135,23 +153,20 @@ export function renderPieChart3D(rc: RenderContext) {
       sweep,
       midAngle: (startAngle + endAngle) / 2,
       color: baseColor,
-      isExploded: idx === 0 && animProgress > 0.4, // Slight pop-out for top slice
+      isExploded: idx === 0 && animProgress > 0.35,
     };
   });
 
-  // Render 3D Extrusion
-  // Draw depth walls first (from back to front, specifically for front-facing curves)
   ctx.save();
 
-  // Step 1: Draw 3D Cylindrical Side Walls
-  // We discretize the arc into segments to create smooth shaded 3D facets
+  // 4. Render 3D Cylindrical Side Walls
   slices.forEach((slice) => {
     if (slice.sweep <= 0.001) return;
 
     let explodeX = 0;
     let explodeY = 0;
     if (slice.isExploded) {
-      const explodeDist = 18 * scale * windowProgress(progress, 0.4, 0.7, Easing.easeOutBack);
+      const explodeDist = 26 * scale * windowProgress(progress, 0.35, 0.7, Easing.easeOutBack);
       explodeX = Math.cos(slice.midAngle) * explodeDist;
       explodeY = Math.sin(slice.midAngle) * explodeDist * 0.55;
     }
@@ -159,19 +174,17 @@ export function renderPieChart3D(rc: RenderContext) {
     const cx = pieCenterX + explodeX;
     const cy = pieCenterY + explodeY;
 
-    // Draw the 3D rim wall for this slice
-    const steps = 30;
+    // Draw rim wall facets
+    const steps = 36;
     const angleStep = slice.sweep / steps;
 
     for (let s = 0; s < steps; s++) {
       const a1 = slice.startAngle + s * angleStep;
       const a2 = a1 + angleStep;
 
-      // Normal vector facing direction to calculate lighting (front face is sin(a) > 0)
       const midA = (a1 + a2) / 2;
       const facing = Math.sin(midA);
 
-      // Only draw side walls visible to camera (facing > -0.1)
       if (facing > -0.05) {
         const x1 = cx + Math.cos(a1) * rx;
         const y1 = cy + Math.sin(a1) * ry;
@@ -185,14 +198,13 @@ export function renderPieChart3D(rc: RenderContext) {
         ctx.lineTo(x1, y1 + depth);
         ctx.closePath();
 
-        // Shading: darker at sides, brighter at direct light
         const light = 0.55 + facing * 0.35 + Math.cos(midA) * 0.15;
         ctx.fillStyle = shadeColor(slice.color, (light - 1) * 45);
         ctx.fill();
       }
     }
 
-    // Radial cut wall at start angle if facing front
+    // Radial cut wall at start angle
     const startSin = Math.sin(slice.startAngle);
     const startCos = Math.cos(slice.startAngle);
     if (startCos < 0.1 && startSin > -0.2) {
@@ -208,7 +220,7 @@ export function renderPieChart3D(rc: RenderContext) {
       ctx.fill();
     }
 
-    // Radial cut wall at end angle if facing front
+    // Radial cut wall at end angle
     const endSin = Math.sin(slice.endAngle);
     const endCos = Math.cos(slice.endAngle);
     if (endCos > -0.1 && endSin > -0.2) {
@@ -225,14 +237,14 @@ export function renderPieChart3D(rc: RenderContext) {
     }
   });
 
-  // Step 2: Draw Top 3D Faces (Elliptical wedges)
+  // 5. Draw Top 3D Faces (Elliptical wedges with glossy top radial shine)
   slices.forEach((slice) => {
     if (slice.sweep <= 0.001) return;
 
     let explodeX = 0;
     let explodeY = 0;
     if (slice.isExploded) {
-      const explodeDist = 18 * scale * windowProgress(progress, 0.4, 0.7, Easing.easeOutBack);
+      const explodeDist = 26 * scale * windowProgress(progress, 0.35, 0.7, Easing.easeOutBack);
       explodeX = Math.cos(slice.midAngle) * explodeDist;
       explodeY = Math.sin(slice.midAngle) * explodeDist * 0.55;
     }
@@ -244,8 +256,7 @@ export function renderPieChart3D(rc: RenderContext) {
     ctx.beginPath();
     ctx.moveTo(cx, cy);
 
-    // Approximate ellipse wedge
-    const steps = 40;
+    const steps = 44;
     const angleStep = slice.sweep / steps;
     for (let s = 0; s <= steps; s++) {
       const a = slice.startAngle + s * angleStep;
@@ -253,54 +264,55 @@ export function renderPieChart3D(rc: RenderContext) {
     }
     ctx.closePath();
 
-    // Top face gradient for glossy 3D shine
-    const topGrad = ctx.createRadialGradient(cx, cy - 20 * scale, 10 * scale, cx, cy, rx);
+    const topGrad = ctx.createRadialGradient(cx, cy - 30 * scale, 15 * scale, cx, cy, rx);
     topGrad.addColorStop(0, shadeColor(slice.color, 25));
     topGrad.addColorStop(0.7, slice.color);
     topGrad.addColorStop(1, shadeColor(slice.color, -15));
 
     ctx.fillStyle = topGrad;
-    ctx.shadowColor = slice.color + '55';
-    ctx.shadowBlur = 16 * scale;
     ctx.fill();
 
-    // Bevel top edge stroke
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-    ctx.lineWidth = 1.2 * scale;
+    // Subtle edge bevel
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 1.5 * scale;
     ctx.stroke();
     ctx.restore();
 
-    // Floating percentage badge above slice
-    if (slice.fraction >= 0.08 && animProgress > 0.4) {
+    // Floating percentage badge above slice (Crisp text, no blurry shadow)
+    if (slice.fraction >= 0.07 && animProgress > 0.35) {
       const badgeProgress = windowProgress(
         progress,
-        0.45 + (slice.fraction * 0.2),
-        0.8,
+        0.35 + (slice.fraction * 0.2),
+        0.75,
         Easing.easeOutBack
       );
 
       if (badgeProgress > 0) {
-        const labelDist = 0.68;
+        const labelDist = 0.65;
         const tx = cx + Math.cos(slice.midAngle) * (rx * labelDist);
-        const ty = cy + Math.sin(slice.midAngle) * (ry * labelDist) - 8 * scale;
+        const ty = cy + Math.sin(slice.midAngle) * (ry * labelDist) - 10 * scale;
 
         const pctText = `${Math.round(slice.fraction * 100 * animProgress)}%`;
         ctx.save();
         ctx.translate(tx, ty);
         ctx.scale(badgeProgress, badgeProgress);
 
-        ctx.font = `bold ${17 * scale}px system-ui, -apple-system, sans-serif`;
-        const tw = ctx.measureText(pctText).width + 16 * scale;
-        const th = 26 * scale;
+        // Reset any shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
 
-        roundRect(ctx, -tw / 2, -th / 2, tw, th, 13 * scale);
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 8 * scale;
+        ctx.font = `800 ${22 * scale}px system-ui, -apple-system, sans-serif`;
+        const tw = ctx.measureText(pctText).width + 24 * scale;
+        const th = 36 * scale;
+
+        roundRect(ctx, -tw / 2, -th / 2, tw, th, 18 * scale);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
         ctx.fill();
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1 * scale;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.lineWidth = 1.5 * scale;
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
@@ -314,16 +326,16 @@ export function renderPieChart3D(rc: RenderContext) {
 
   ctx.restore();
 
-  // Step 3: Legend on Right Side
-  const legendX = cardX + cardWidth * 0.71;
-  const legendY = cardY + 160 * scale;
-  const legendSpacing = 58 * scale;
+  // 6. Crisp Legend on Right Side (Large, high-contrast, perfectly sharp text)
+  const legendX = cardX + cardWidth * 0.70;
+  const legendY = cardY + 200 * scale;
+  const legendSpacing = 72 * scale; // Increased spacing for larger text
 
   slices.forEach((slice, idx) => {
     const itemEntrance = windowProgress(
       progress,
-      0.3 + idx * 0.1,
-      0.55 + idx * 0.1,
+      0.25 + idx * 0.08,
+      0.5 + idx * 0.08,
       Easing.easeOutBack
     );
 
@@ -335,29 +347,35 @@ export function renderPieChart3D(rc: RenderContext) {
     ctx.translate(legendX, ly);
     ctx.scale(itemEntrance, itemEntrance);
 
-    // Glowing Color Indicator Pill
-    roundRect(ctx, 0, 0, 20 * scale, 20 * scale, 6 * scale);
-    ctx.fillStyle = slice.color;
-    ctx.shadowColor = slice.color;
-    ctx.shadowBlur = 10 * scale;
-    ctx.fill();
-
-    // Label
+    // Guaranteed ZERO shadow on text
+    ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    // Glowing Color Indicator Pill
+    roundRect(ctx, 0, 0, 24 * scale, 24 * scale, 8 * scale);
+    ctx.fillStyle = slice.color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1.5 * scale;
+    ctx.stroke();
+
+    // Primary Label (Crisp, large, bold)
     ctx.fillStyle = config.textColor || '#ffffff';
-    ctx.font = `600 ${20 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.font = `700 ${26 * scale}px system-ui, -apple-system, sans-serif`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(slice.label, 32 * scale, 10 * scale);
+    ctx.fillText(slice.label, 40 * scale, 12 * scale);
 
     // Value & Pct
     const currentSliceVal = Math.round(lerp(0, slice.value, animProgress));
     const pct = Math.round(slice.fraction * 100);
-    const subText = `${config.prefix || ''}${currentSliceVal}${config.suffix || ''} (${pct}%)`;
+    const subText = `${config.prefix || ''}${currentSliceVal}${config.suffix || ''}  •  ${pct}% share`;
 
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
-    ctx.font = `500 ${15 * scale}px system-ui, -apple-system, sans-serif`;
-    ctx.fillText(subText, 32 * scale, 30 * scale);
+    ctx.fillStyle = 'rgba(203, 213, 225, 0.95)';
+    ctx.font = `600 ${19 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.fillText(subText, 40 * scale, 38 * scale);
 
     ctx.restore();
   });

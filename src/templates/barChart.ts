@@ -35,6 +35,12 @@ export function renderBarChart(rc: RenderContext) {
   ctx.shadowOffsetY = 16 * scale;
   ctx.fill();
 
+  // Reset shadow immediately to keep text razor sharp
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
   // Card Border Glow
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1.5 * scale;

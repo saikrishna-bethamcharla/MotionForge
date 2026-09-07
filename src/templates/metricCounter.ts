@@ -28,6 +28,12 @@ export function renderMetricCounter(rc: RenderContext) {
   ctx.shadowOffsetY = 20 * scale;
   ctx.fill();
 
+  // Reset shadow immediately
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
   // Glowing Border
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1.5 * scale;
