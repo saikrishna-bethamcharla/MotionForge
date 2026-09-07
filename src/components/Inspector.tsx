@@ -394,13 +394,29 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
               </div>
               <input
                 type="range"
-                min={1.5}
-                max={6.0}
+                min={1.0}
+                max={10.0}
                 step={0.5}
                 value={config.duration}
                 onChange={(e) => onChange({ duration: parseFloat(e.target.value) })}
                 className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
               />
+              <div className="flex gap-1.5 mt-2">
+                {[3, 5, 8, 10].map((sec) => (
+                  <button
+                    key={sec}
+                    type="button"
+                    onClick={() => onChange({ duration: sec })}
+                    className={`flex-1 py-1 rounded text-[11px] font-mono font-medium transition ${
+                      Math.abs(config.duration - sec) < 0.1
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="pt-3 border-t border-slate-800">

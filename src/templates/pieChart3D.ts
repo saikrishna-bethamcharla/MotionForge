@@ -44,9 +44,9 @@ export function renderPieChart3D(rc: RenderContext) {
   const cardX = (width - cardWidth) / 2;
   const cardY = (height - cardHeight) / 2;
 
-  // Entrance animation
-  const cardEntrance = windowProgress(progress, 0, 0.22, Easing.easeOutCubic);
-  const cardAlpha = windowProgress(progress, 0, 0.18, Easing.easeOutQuad);
+  // Rapid entrance so visual is immediately present
+  const cardEntrance = windowProgress(progress, 0, 0.06, Easing.easeOutCubic);
+  const cardAlpha = windowProgress(progress, 0, 0.04, Easing.easeOutQuad);
 
   ctx.save();
   ctx.translate(width / 2, height / 2);
@@ -75,7 +75,7 @@ export function renderPieChart3D(rc: RenderContext) {
   ctx.stroke();
 
   // 2. Crisp Header Title & Subtitle (Zero shadow blur for maximum sharpness)
-  const titleAlpha = windowProgress(progress, 0.1, 0.35, Easing.easeOutCubic);
+  const titleAlpha = windowProgress(progress, 0.01, 0.08, Easing.easeOutCubic);
   ctx.save();
   ctx.globalAlpha = titleAlpha;
   ctx.shadowColor = 'transparent';
@@ -116,15 +116,15 @@ export function renderPieChart3D(rc: RenderContext) {
   }
   ctx.restore();
 
-  // 3. 3D Pie Geometry (Much larger, immersive size)
+  // 3. 3D Pie Geometry (Full screen presence)
   const pieCenterX = cardX + cardWidth * 0.36;
   const pieCenterY = cardY + cardHeight * 0.58;
-  const rx = 320 * scale; // Increased from 210 -> 320 for full screen impact!
-  const ry = 175 * scale; // Vertical radius
-  const depth = 65 * scale; // 3D extrusion thickness
+  const rx = 320 * scale;
+  const ry = 175 * scale;
+  const depth = 65 * scale;
 
-  // Rotation animation
-  const animProgress = windowProgress(progress, 0.15, 0.85, Easing.easeOutCubic);
+  // Rotation & sweep animation: starts immediately and completes by 32% of duration!
+  const animProgress = windowProgress(progress, 0.04, 0.32, Easing.easeOutCubic);
   const baseRotation = lerp(-Math.PI * 0.75, -Math.PI * 0.5, animProgress);
 
   const palette = [
@@ -153,7 +153,7 @@ export function renderPieChart3D(rc: RenderContext) {
       sweep,
       midAngle: (startAngle + endAngle) / 2,
       color: baseColor,
-      isExploded: idx === 0 && animProgress > 0.35,
+      isExploded: idx === 0 && animProgress > 0.3,
     };
   });
 
@@ -279,11 +279,11 @@ export function renderPieChart3D(rc: RenderContext) {
     ctx.restore();
 
     // Floating percentage badge above slice (Crisp text, no blurry shadow)
-    if (slice.fraction >= 0.07 && animProgress > 0.35) {
+    if (slice.fraction >= 0.07 && animProgress > 0.15) {
       const badgeProgress = windowProgress(
         progress,
-        0.35 + (slice.fraction * 0.2),
-        0.75,
+        0.10 + (slice.fraction * 0.08),
+        0.30,
         Easing.easeOutBack
       );
 
@@ -334,8 +334,8 @@ export function renderPieChart3D(rc: RenderContext) {
   slices.forEach((slice, idx) => {
     const itemEntrance = windowProgress(
       progress,
-      0.25 + idx * 0.08,
-      0.5 + idx * 0.08,
+      0.04 + idx * 0.03,
+      0.16 + idx * 0.03,
       Easing.easeOutBack
     );
 

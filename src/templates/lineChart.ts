@@ -18,9 +18,9 @@ export function renderLineChart(rc: RenderContext) {
   const cardX = (width - cardWidth) / 2;
   const cardY = (height - cardHeight) / 2;
 
-  // Entrance
-  const cardEntrance = windowProgress(progress, 0, 0.25, Easing.easeOutBack);
-  const cardAlpha = windowProgress(progress, 0, 0.2, Easing.easeOutQuad);
+  // Rapid Entrance
+  const cardEntrance = windowProgress(progress, 0, 0.06, Easing.easeOutCubic);
+  const cardAlpha = windowProgress(progress, 0, 0.04, Easing.easeOutQuad);
 
   ctx.save();
   ctx.translate(width / 2, height / 2);
@@ -48,7 +48,7 @@ export function renderLineChart(rc: RenderContext) {
   ctx.stroke();
 
   // Title
-  const titleAlpha = windowProgress(progress, 0.15, 0.35, Easing.easeOutCubic);
+  const titleAlpha = windowProgress(progress, 0.02, 0.08, Easing.easeOutCubic);
   ctx.save();
   ctx.globalAlpha = titleAlpha;
   ctx.fillStyle = config.textColor || '#ffffff';
@@ -70,7 +70,7 @@ export function renderLineChart(rc: RenderContext) {
   const chartH = cardHeight - 240 * scale;
 
   // Grid
-  const gridAlpha = windowProgress(progress, 0.2, 0.4, Easing.easeOutQuad);
+  const gridAlpha = windowProgress(progress, 0.03, 0.10, Easing.easeOutQuad);
   ctx.save();
   ctx.globalAlpha = gridAlpha;
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
@@ -94,8 +94,8 @@ export function renderLineChart(rc: RenderContext) {
     label: it.label,
   }));
 
-  // Line drawing animation progress
-  const lineDrawProgress = windowProgress(progress, 0.3, 0.85, Easing.easeOutCubic);
+  // Line drawing animation completes by 35% of timeline
+  const lineDrawProgress = windowProgress(progress, 0.05, 0.35, Easing.easeOutCubic);
 
   if (points.length >= 2 && lineDrawProgress > 0) {
     // We construct the path up to lineDrawProgress

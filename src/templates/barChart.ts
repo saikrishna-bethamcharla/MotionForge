@@ -17,9 +17,9 @@ export function renderBarChart(rc: RenderContext) {
   const cardX = (width - cardWidth) / 2;
   const cardY = (height - cardHeight) / 2;
 
-  // 1. Entrance animation (card scale and fade)
-  const cardEntrance = windowProgress(progress, 0, 0.25, Easing.easeOutBack);
-  const cardAlpha = windowProgress(progress, 0, 0.2, Easing.easeOutQuad);
+  // 1. Rapid entrance
+  const cardEntrance = windowProgress(progress, 0, 0.06, Easing.easeOutCubic);
+  const cardAlpha = windowProgress(progress, 0, 0.04, Easing.easeOutQuad);
 
   ctx.save();
   ctx.translate(width / 2, height / 2);
@@ -47,7 +47,7 @@ export function renderBarChart(rc: RenderContext) {
   ctx.stroke();
 
   // Header Title & Subtitle
-  const titleEntrance = windowProgress(progress, 0.15, 0.4, Easing.easeOutCubic);
+  const titleEntrance = windowProgress(progress, 0.02, 0.08, Easing.easeOutCubic);
   ctx.save();
   ctx.globalAlpha = titleEntrance;
   ctx.translate(0, (1 - titleEntrance) * -15 * scale);
@@ -92,7 +92,7 @@ export function renderBarChart(rc: RenderContext) {
   const chartH = cardHeight - 240 * scale;
 
   // Background Grid Lines
-  const gridAlpha = windowProgress(progress, 0.2, 0.45, Easing.easeOutQuad);
+  const gridAlpha = windowProgress(progress, 0.03, 0.10, Easing.easeOutQuad);
   ctx.save();
   ctx.globalAlpha = gridAlpha;
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
@@ -116,9 +116,9 @@ export function renderBarChart(rc: RenderContext) {
   const startX = chartX + (chartW - totalBarsWidth) / 2;
 
   items.forEach((item, index) => {
-    // Staggered bar animation
-    const staggerStart = 0.25 + (index / n) * 0.35;
-    const staggerEnd = staggerStart + 0.35;
+    // Staggered bar animation completes by 30% of timeline!
+    const staggerStart = 0.04 + (index / n) * 0.16;
+    const staggerEnd = staggerStart + 0.16;
     const barProgress = windowProgress(progress, staggerStart, staggerEnd, Easing.easeOutBack);
     
     if (barProgress <= 0) return;
