@@ -53,7 +53,9 @@ export interface TemplateConfig {
   // Social specific
   handle?: string;
   subscriberCount?: string;
+  likesCount?: string;
   avatarText?: string;
+  enableSFX?: boolean;
 }
 
 export interface RenderContext {

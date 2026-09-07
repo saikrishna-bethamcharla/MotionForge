@@ -26,6 +26,7 @@ export function App() {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isLooping, setIsLooping] = useState<boolean>(true);
+  const [isSFXEnabled, setIsSFXEnabled] = useState<boolean>(true);
 
   // Export states
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
@@ -169,6 +170,8 @@ export function App() {
           currentTime={currentTime}
           isPlaying={isPlaying}
           isLooping={isLooping}
+          isSFXEnabled={isSFXEnabled}
+          onToggleSFX={() => setIsSFXEnabled(!isSFXEnabled)}
           onTimeChange={setCurrentTime}
           onTogglePlay={() => setIsPlaying(!isPlaying)}
           onToggleLoop={() => setIsLooping(!isLooping)}

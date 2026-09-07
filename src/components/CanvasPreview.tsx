@@ -2,7 +2,8 @@ import { useRef, useEffect } from 'react';
 import { RESOLUTIONS } from '../types/template';
 import type { BackgroundMode, RenderContext, TemplateConfig, AspectRatio } from '../types/template';
 import { TEMPLATES } from '../templates/registry';
-import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Repeat } from 'lucide-react';
+import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Repeat, Volume2, VolumeX } from 'lucide-react';
+import { sfxManager } from '../engine/audio';
 
 interface CanvasPreviewProps {
   templateId: string;
@@ -12,6 +13,8 @@ interface CanvasPreviewProps {
   currentTime: number;
   isPlaying: boolean;
   isLooping: boolean;
+  isSFXEnabled: boolean;
+  onToggleSFX: () => void;
   onTimeChange: (time: number) => void;
   onTogglePlay: () => void;
   onToggleLoop: () => void;
@@ -27,6 +30,8 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   currentTime,
   isPlaying,
   isLooping,
+  isSFXEnabled,
+  onToggleSFX,
   onTimeChange,
   onTogglePlay,
   onToggleLoop,
@@ -81,6 +86,16 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
       template.render(renderContext);
     }
   }, [templateId, config, res, bgMode, progress, currentTime]);
+
+  // Trigger procedural sound effects during playback
+  useEffect(() => {
+    if (currentTime <= 0.05) {
+      sfxManager.reset();
+    }
+    if (isPlaying) {
+      sfxManager.checkAndPlayTriggers(templateId, progress, isSFXEnabled);
+    }
+  }, [currentTime, progress, isPlaying, templateId, isSFXEnabled]);
 
   // Format time display: mm:ss.s
   const formatTime = (secs: number) => {
@@ -189,6 +204,19 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={onToggleSFX}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition ${
+                isSFXEnabled
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+              title="Toggle Sound Effects (SFX)"
+            >
+              {isSFXEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              <span>{isSFXEnabled ? 'SFX ON' : 'SFX Muted'}</span>
+            </button>
+
             <button
               onClick={onToggleLoop}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition ${

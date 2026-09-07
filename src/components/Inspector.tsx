@@ -223,6 +223,26 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
                     className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
+                <div>
+                  <span className="text-xs text-slate-300 block mb-1">Handle (e.g. @username)</span>
+                  <input
+                    type="text"
+                    value={config.handle || ''}
+                    onChange={(e) => onChange({ handle: e.target.value })}
+                    placeholder="@channel"
+                    className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <span className="text-xs text-slate-300 block mb-1">Followers / Subscriber Count</span>
+                  <input
+                    type="text"
+                    value={config.subscriberCount || ''}
+                    onChange={(e) => onChange({ subscriberCount: e.target.value })}
+                    placeholder="1.2M"
+                    className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
               </div>
             )}
 

@@ -6,6 +6,9 @@ import { renderRadialDonut } from './radialDonut';
 import { renderMetricCounter } from './metricCounter';
 import { renderLowerThird } from './lowerThird';
 import { renderSocialCallout } from './socialCallout';
+import { renderYouTubeAction } from './youtubeAction';
+import { renderInstagramPop } from './instagramPop';
+import { renderFacebookReaction } from './facebookReaction';
 
 export interface TemplateDefinition {
   id: string;
@@ -212,6 +215,83 @@ export const TEMPLATES: TemplateDefinition[] = [
       accentColor: '#fbbf24',
       textColor: '#ffffff',
       cardColor: 'rgba(15, 23, 42, 0.95)',
+      enableSFX: true,
+    },
+  },
+  {
+    id: 'youtube-action',
+    name: 'YouTube Action Bar',
+    category: 'social',
+    description: 'YouTube 3-in-1 overlay with animated Like button, Subscribe button, and Bell chime SFX.',
+    render: renderYouTubeAction,
+    defaultConfig: {
+      id: 'youtube-action',
+      name: 'YouTube Action Bar',
+      category: 'social',
+      description: 'Like, Subscribe & Bell notification overlay with synchronized SFX',
+      duration: 3.5,
+      fps: 60,
+      title: 'MotionForge Studio',
+      subtitle: '1.48M subscribers',
+      avatarText: 'MF',
+      subscriberCount: '1.48M',
+      primaryColor: '#ff0000',
+      secondaryColor: '#38bdf8',
+      accentColor: '#f59e0b',
+      textColor: '#ffffff',
+      cardColor: 'rgba(15, 23, 42, 0.95)',
+      enableSFX: true,
+    },
+  },
+  {
+    id: 'instagram-pop',
+    name: 'Instagram Follow & Like',
+    category: 'social',
+    description: 'Instagram Reel/Post follow banner with rainbow gradient story ring, verified badge, and popping heart SFX.',
+    render: renderInstagramPop,
+    defaultConfig: {
+      id: 'instagram-pop',
+      name: 'Instagram Follow & Like',
+      category: 'social',
+      description: 'Instagram double-tap heart pop and follow button with audio SFX',
+      duration: 3.5,
+      fps: 60,
+      title: 'motion.creator',
+      handle: '@motion.creator',
+      subtitle: '320K followers',
+      avatarText: 'IG',
+      subscriberCount: '320K',
+      primaryColor: '#d62976',
+      secondaryColor: '#fa7e1e',
+      accentColor: '#0095f6',
+      textColor: '#ffffff',
+      cardColor: 'rgba(15, 23, 42, 0.95)',
+      enableSFX: true,
+    },
+  },
+  {
+    id: 'facebook-reaction',
+    name: 'Facebook Reaction Bar',
+    category: 'social',
+    description: 'Facebook floating reactions (Like, Love, Care, Haha) with follow button and reaction pop SFX.',
+    render: renderFacebookReaction,
+    defaultConfig: {
+      id: 'facebook-reaction',
+      name: 'Facebook Reaction Bar',
+      category: 'social',
+      description: 'Facebook floating reaction bubbles and page follow banner',
+      duration: 3.5,
+      fps: 60,
+      title: 'MotionForge Official',
+      subtitle: '620K followers',
+      avatarText: 'FB',
+      subscriberCount: '620K',
+      primaryColor: '#1877f2',
+      secondaryColor: '#fa3e3e',
+      accentColor: '#f7b125',
+      textColor: '#ffffff',
+      cardColor: 'rgba(15, 23, 42, 0.95)',
+      enableSFX: true,
     },
   },
 ];

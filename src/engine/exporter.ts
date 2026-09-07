@@ -1,5 +1,6 @@
 import type { TemplateConfig, BackgroundMode, RenderContext } from '../types/template';
 import { TEMPLATES } from '../templates/registry';
+import { playPop, playClick, playBell, playHeart } from './audio';
 
 export interface ExportOptions {
   config: TemplateConfig;
@@ -118,7 +119,10 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
   if (!ctx) throw new Error('Failed to get canvas 2d context');
 
   // Select best supported MIME type
-  let mimeType = 'video/webm;codecs=vp9';
+  let mimeType = 'video/webm;codecs=vp9,opus';
+  if (!MediaRecorder.isTypeSupported(mimeType)) {
+    mimeType = 'video/webm;codecs=vp9';
+  }
   if (!MediaRecorder.isTypeSupported(mimeType)) {
     mimeType = 'video/webm;codecs=vp8';
   }
@@ -126,9 +130,28 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
     mimeType = 'video/webm';
   }
 
-  // Create stream from canvas
-  const stream = canvas.captureStream(fps);
-  const track = stream.getVideoTracks()[0];
+  // Setup Audio Context for video sound effects
+  let audioCtx: AudioContext | null = null;
+  let audioDest: MediaStreamAudioDestinationNode | null = null;
+  let audioTrack: MediaStreamTrack | null = null;
+
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    audioCtx = new AudioContextClass();
+    audioDest = audioCtx.createMediaStreamDestination();
+    audioTrack = audioDest.stream.getAudioTracks()[0] || null;
+  } catch (e) {
+    console.warn('Web Audio capture not supported, continuing with video only', e);
+  }
+
+  // Create combined stream (Canvas Video + Synthesized Audio)
+  const canvasStream = canvas.captureStream(fps);
+  const videoTrack = canvasStream.getVideoTracks()[0];
+  const streamTracks: MediaStreamTrack[] = [videoTrack];
+  if (audioTrack && config.enableSFX !== false) {
+    streamTracks.push(audioTrack);
+  }
+  const stream = new MediaStream(streamTracks);
 
   const recordedChunks: Blob[] = [];
   const recorder = new MediaRecorder(stream, {
@@ -153,11 +176,37 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
   recorder.start();
 
   const frameIntervalMs = 1000 / fps;
+  const sfxFired = new Set<string>();
 
   // Render each frame sequentially
   for (let f = 0; f < totalFrames; f++) {
     const progress = f / (totalFrames - 1 || 1);
     const currentTime = progress * duration;
+
+    // Trigger audio into export stream
+    if (audioCtx && audioDest && config.enableSFX !== false) {
+      const trigger = (id: string, fn: () => void) => {
+        if (!sfxFired.has(id)) {
+          sfxFired.add(id);
+          fn();
+        }
+      };
+
+      if (templateId === 'youtube-action' || templateId === 'social-callout') {
+        if (progress >= 0.18) trigger('like', () => playPop(audioCtx!, audioDest!));
+        if (progress >= 0.32) trigger('sub', () => playClick(audioCtx!, audioDest!));
+        if (progress >= 0.44) trigger('bell', () => playBell(audioCtx!, audioDest!));
+      }
+      if (templateId === 'instagram-pop') {
+        if (progress >= 0.16) trigger('heart', () => playHeart(audioCtx!, audioDest!));
+        if (progress >= 0.32) trigger('follow', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'facebook-reaction') {
+        if (progress >= 0.15) trigger('fb_like', () => playPop(audioCtx!, audioDest!));
+        if (progress >= 0.26) trigger('fb_love', () => playHeart(audioCtx!, audioDest!));
+        if (progress >= 0.36) trigger('fb_follow', () => playClick(audioCtx!, audioDest!));
+      }
+    }
 
     // Clear / background fill
     if (bgMode === 'greenscreen') {
@@ -190,8 +239,8 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
     template.render(renderContext);
 
     // If canvas stream track supports requestFrame, invoke it
-    if (track && 'requestFrame' in track) {
-      (track as any).requestFrame();
+    if (videoTrack && 'requestFrame' in videoTrack) {
+      (videoTrack as any).requestFrame();
     }
 
     if (onProgress) {
