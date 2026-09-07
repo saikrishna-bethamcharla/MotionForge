@@ -126,6 +126,91 @@ export function playHeart(ctx: BaseAudioContext = getAudioContext(), dest: Audio
 }
 
 /**
+ * Creates audio nodes for a high-tech glitch/pop (TikTok, Cyberpunk HUD)
+ */
+export function playGlitch(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(880, now);
+  osc.frequency.setValueAtTime(220, now + 0.02);
+  osc.frequency.setValueAtTime(1760, now + 0.04);
+  osc.frequency.exponentialRampToValueAtTime(110, now + 0.08);
+
+  gain.gain.setValueAtTime(0.2, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
+
+  osc.connect(gain);
+  gain.connect(dest);
+
+  osc.start(now);
+  osc.stop(now + 0.09);
+}
+
+/**
+ * Creates audio nodes for a sparkling star/success chime (Milestones, Ratings)
+ */
+export function playStarChime(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+
+  notes.forEach((freq, idx) => {
+    const t = now + idx * 0.06;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, t);
+
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+
+    osc.connect(gain);
+    gain.connect(dest);
+
+    osc.start(t);
+    osc.stop(t + 0.3);
+  });
+}
+
+/**
+ * Creates audio nodes for a smooth cinematic whoosh (Breaking News, Lower Thirds)
+ */
+export function playWhoosh(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const bufferSize = ctx.sampleRate * 0.25;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.Q.value = 2.5;
+  filter.frequency.setValueAtTime(200, now);
+  filter.frequency.exponentialRampToValueAtTime(2800, now + 0.12);
+  filter.frequency.exponentialRampToValueAtTime(300, now + 0.24);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.01, now);
+  gain.gain.linearRampToValueAtTime(0.35, now + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+
+  noise.start(now);
+  noise.stop(now + 0.26);
+}
+
+/**
  * Sound triggers dispatcher based on template timeline progression
  */
 export class SFXManager {
@@ -167,6 +252,33 @@ export class SFXManager {
       if (progress >= 0.15) fireOnce('fb_like', () => playPop());
       if (progress >= 0.26) fireOnce('fb_love', () => playHeart());
       if (progress >= 0.36) fireOnce('fb_follow', () => playClick());
+    }
+
+    // TikTok triggers
+    if (templateId === 'tiktok-pop') {
+      if (progress >= 0.12) fireOnce('tt_glitch', () => playGlitch());
+      if (progress >= 0.22) fireOnce('tt_pop', () => playPop());
+      if (progress >= 0.38) fireOnce('tt_click', () => playClick());
+    }
+
+    // Twitter / X triggers
+    if (templateId === 'twitter-callout') {
+      if (progress >= 0.18) fireOnce('tw_repost', () => playPop());
+      if (progress >= 0.30) fireOnce('tw_like', () => playHeart());
+      if (progress >= 0.42) fireOnce('tw_bell', () => playClick());
+    }
+
+    // Milestone & Star Rating triggers
+    if (templateId === 'goal-progress' || templateId === 'star-review') {
+      if (progress >= 0.25) fireOnce('milestone_chime', () => playStarChime());
+    }
+
+    // Breaking News & Cyberpunk HUD triggers
+    if (templateId === 'breaking-news') {
+      if (progress >= 0.08) fireOnce('news_whoosh', () => playWhoosh());
+    }
+    if (templateId === 'cyberpunk-hud') {
+      if (progress >= 0.10) fireOnce('hud_glitch', () => playGlitch());
     }
   }
 }

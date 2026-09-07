@@ -1,6 +1,6 @@
 import type { TemplateConfig, BackgroundMode, RenderContext } from '../types/template';
 import { TEMPLATES } from '../templates/registry';
-import { playPop, playClick, playBell, playHeart } from './audio';
+import { playPop, playClick, playBell, playHeart, playGlitch, playStarChime, playWhoosh } from './audio';
 
 export interface ExportOptions {
   config: TemplateConfig;
@@ -205,6 +205,25 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
         if (progress >= 0.15) trigger('fb_like', () => playPop(audioCtx!, audioDest!));
         if (progress >= 0.26) trigger('fb_love', () => playHeart(audioCtx!, audioDest!));
         if (progress >= 0.36) trigger('fb_follow', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'tiktok-pop') {
+        if (progress >= 0.12) trigger('tt_glitch', () => playGlitch(audioCtx!, audioDest!));
+        if (progress >= 0.22) trigger('tt_pop', () => playPop(audioCtx!, audioDest!));
+        if (progress >= 0.38) trigger('tt_click', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'twitter-callout') {
+        if (progress >= 0.18) trigger('tw_repost', () => playPop(audioCtx!, audioDest!));
+        if (progress >= 0.30) trigger('tw_like', () => playHeart(audioCtx!, audioDest!));
+        if (progress >= 0.42) trigger('tw_bell', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'goal-progress' || templateId === 'star-review') {
+        if (progress >= 0.25) trigger('milestone_chime', () => playStarChime(audioCtx!, audioDest!));
+      }
+      if (templateId === 'breaking-news') {
+        if (progress >= 0.08) trigger('news_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+      }
+      if (templateId === 'cyberpunk-hud') {
+        if (progress >= 0.10) trigger('hud_glitch', () => playGlitch(audioCtx!, audioDest!));
       }
     }
 
