@@ -1,6 +1,6 @@
 import { TEMPLATES } from '../templates/registry';
 import type { TemplateDefinition } from '../templates/registry';
-import { BarChart3, TrendingUp, PieChart, Hash, Subtitles, Bell, Layers } from 'lucide-react';
+import { BarChart3, TrendingUp, PieChart, CircleDot, Hash, Subtitles, Bell, Layers } from 'lucide-react';
 
 interface TemplateSelectorProps {
   selectedId: string;
@@ -11,6 +11,7 @@ const ICONS: Record<string, React.ReactNode> = {
   'bar-chart': <BarChart3 className="w-4 h-4" />,
   'line-chart': <TrendingUp className="w-4 h-4" />,
   'pie-chart-3d': <PieChart className="w-4 h-4" />,
+  'radial-donut': <CircleDot className="w-4 h-4" />,
   'metric-counter': <Hash className="w-4 h-4" />,
   'lower-third': <Subtitles className="w-4 h-4" />,
   'social-callout': <Bell className="w-4 h-4" />,

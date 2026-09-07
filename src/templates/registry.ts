@@ -2,6 +2,7 @@ import type { TemplateConfig, RenderContext } from '../types/template';
 import { renderBarChart } from './barChart';
 import { renderLineChart } from './lineChart';
 import { renderPieChart3D } from './pieChart3D';
+import { renderRadialDonut } from './radialDonut';
 import { renderMetricCounter } from './metricCounter';
 import { renderLowerThird } from './lowerThird';
 import { renderSocialCallout } from './socialCallout';
@@ -108,6 +109,34 @@ export const TEMPLATES: TemplateDefinition[] = [
         { id: '2', label: 'Marketing', value: 28, color: '#38bdf8' },
         { id: '3', label: 'Operations', value: 18, color: '#a855f7' },
         { id: '4', label: 'Sales & BD', value: 12, color: '#ec4899' },
+      ],
+    },
+  },
+  {
+    id: 'radial-donut',
+    name: 'Radial Donut Rings',
+    category: 'chart',
+    description: 'Concentric glowing activity rings with glowing head particles, center metric, and breakdown cards.',
+    render: renderRadialDonut,
+    defaultConfig: {
+      id: 'radial-donut',
+      name: 'Radial Donut Rings',
+      category: 'chart',
+      description: 'Concentric goal and activity progress rings',
+      duration: 3.5,
+      fps: 60,
+      title: 'Performance Goals',
+      subtitle: 'Daily target completion overview',
+      badgeText: 'TARGET 100%',
+      primaryColor: '#6366f1',
+      secondaryColor: '#38bdf8',
+      accentColor: '#ec4899',
+      textColor: '#ffffff',
+      cardColor: 'rgba(15, 23, 42, 0.94)',
+      chartData: [
+        { id: '1', label: 'Active Energy', value: 85, color: '#6366f1' },
+        { id: '2', label: 'Workout Goal', value: 68, color: '#38bdf8' },
+        { id: '3', label: 'Consistency', value: 92, color: '#ec4899' },
       ],
     },
   },
