@@ -1,4 +1,4 @@
-export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social';
+export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social' | 'news';
 
 export type BackgroundMode = 'transparent' | 'greenscreen' | 'bluescreen' | 'dark' | 'light';
 
@@ -21,6 +21,13 @@ export interface ChartDataItem {
   label: string;
   value: number;
   color?: string;
+}
+
+export interface TimelineItem {
+  id: string;
+  date: string;
+  title: string;
+  description?: string;
 }
 
 export interface TemplateConfig {
@@ -56,6 +63,16 @@ export interface TemplateConfig {
   likesCount?: string;
   avatarText?: string;
   enableSFX?: boolean;
+
+  // News / Documentary specific
+  sourceCitation?: string;
+  locationText?: string;
+  dateText?: string;
+  quoteText?: string;
+  authorRole?: string;
+  highlightText?: string;
+  chapterNumber?: string;
+  timelineItems?: TimelineItem[];
 }
 
 export interface RenderContext {

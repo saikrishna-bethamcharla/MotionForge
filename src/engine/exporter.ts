@@ -219,8 +219,18 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
       if (templateId === 'goal-progress' || templateId === 'star-review') {
         if (progress >= 0.25) trigger('milestone_chime', () => playStarChime(audioCtx!, audioDest!));
       }
-      if (templateId === 'breaking-news') {
+      if (templateId === 'breaking-news' || templateId === 'breaking-news-bar' || templateId === 'news-lower-third' || templateId === 'headline-card' || templateId === 'interview-identifier') {
         if (progress >= 0.08) trigger('news_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+      }
+      if (templateId === 'location-date-slug' || templateId === 'source-citation' || templateId === 'chapter-heading') {
+        if (progress >= 0.06) trigger('doc_click', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'document-highlight' || templateId === 'newspaper-clipping' || templateId === 'evidence-casefile') {
+        if (progress >= 0.08) trigger('paper_slide', () => playWhoosh(audioCtx!, audioDest!));
+        if (progress >= 0.22) trigger('evidence_stamp', () => playClick(audioCtx!, audioDest!));
+      }
+      if (templateId === 'quote-graphic' || templateId === 'according-to-graphic' || templateId === 'doc-timeline' || templateId === 'photo-collage') {
+        if (progress >= 0.12) trigger('quote_reveal', () => playStarChime(audioCtx!, audioDest!));
       }
       if (templateId === 'cyberpunk-hud') {
         if (progress >= 0.10) trigger('hud_glitch', () => playGlitch(audioCtx!, audioDest!));

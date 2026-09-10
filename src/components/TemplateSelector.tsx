@@ -23,6 +23,17 @@ import {
   Cpu,
   Video,
   MessageSquare,
+  FileText,
+  MapPin,
+  Quote,
+  Bookmark,
+  FileQuestion,
+  Milestone,
+  Highlighter,
+  FolderOpen,
+  Image as ImageIcon,
+  Mic,
+  BookOpen,
 } from 'lucide-react';
 
 interface TemplateSelectorProps {
@@ -34,6 +45,7 @@ type FilterCategory = 'all' | TemplateCategory;
 
 const CATEGORY_TABS: { id: FilterCategory; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: 'All Templates', icon: <Layers className="w-3.5 h-3.5" /> },
+  { id: 'news', label: 'News & Doc', icon: <Newspaper className="w-3.5 h-3.5 text-amber-400" /> },
   { id: 'chart', label: 'Graphs & Charts', icon: <BarChart3 className="w-3.5 h-3.5 text-blue-400" /> },
   { id: 'social', label: 'Social Media', icon: <Camera className="w-3.5 h-3.5 text-pink-400" /> },
   { id: 'metric', label: 'Metrics & Goals', icon: <Hash className="w-3.5 h-3.5 text-emerald-400" /> },
@@ -59,6 +71,21 @@ const ICONS: Record<string, React.ReactNode> = {
   'facebook-reaction': <ThumbsUp className="w-4 h-4 text-blue-500" />,
   'tiktok-pop': <Video className="w-4 h-4 text-teal-400" />,
   'twitter-callout': <MessageSquare className="w-4 h-4 text-sky-400" />,
+  // News & Documentary icons
+  'breaking-news-bar': <Newspaper className="w-4 h-4 text-red-500" />,
+  'news-lower-third': <Subtitles className="w-4 h-4 text-blue-400" />,
+  'location-date-slug': <MapPin className="w-4 h-4 text-amber-500" />,
+  'headline-card': <FileText className="w-4 h-4 text-red-400" />,
+  'quote-graphic': <Quote className="w-4 h-4 text-indigo-400" />,
+  'source-citation': <Bookmark className="w-4 h-4 text-sky-400" />,
+  'according-to-graphic': <FileQuestion className="w-4 h-4 text-amber-400" />,
+  'doc-timeline': <Milestone className="w-4 h-4 text-indigo-400" />,
+  'document-highlight': <Highlighter className="w-4 h-4 text-yellow-400" />,
+  'newspaper-clipping': <Newspaper className="w-4 h-4 text-amber-200" />,
+  'evidence-casefile': <FolderOpen className="w-4 h-4 text-yellow-600" />,
+  'photo-collage': <ImageIcon className="w-4 h-4 text-blue-300" />,
+  'interview-identifier': <Mic className="w-4 h-4 text-cyan-400" />,
+  'chapter-heading': <BookOpen className="w-4 h-4 text-amber-400" />,
 };
 
 export const TemplateSelector: React.FC<TemplateSelectorProps> = ({

@@ -274,8 +274,18 @@ export class SFXManager {
     }
 
     // Breaking News & Cyberpunk HUD triggers
-    if (templateId === 'breaking-news') {
+    if (templateId === 'breaking-news' || templateId === 'breaking-news-bar' || templateId === 'news-lower-third' || templateId === 'headline-card' || templateId === 'interview-identifier') {
       if (progress >= 0.08) fireOnce('news_whoosh', () => playWhoosh());
+    }
+    if (templateId === 'location-date-slug' || templateId === 'source-citation' || templateId === 'chapter-heading') {
+      if (progress >= 0.06) fireOnce('doc_click', () => playClick());
+    }
+    if (templateId === 'document-highlight' || templateId === 'newspaper-clipping' || templateId === 'evidence-casefile') {
+      if (progress >= 0.08) fireOnce('paper_slide', () => playWhoosh());
+      if (progress >= 0.22) fireOnce('evidence_stamp', () => playClick());
+    }
+    if (templateId === 'quote-graphic' || templateId === 'according-to-graphic' || templateId === 'doc-timeline' || templateId === 'photo-collage') {
+      if (progress >= 0.12) fireOnce('quote_reveal', () => playStarChime());
     }
     if (templateId === 'cyberpunk-hud') {
       if (progress >= 0.10) fireOnce('hud_glitch', () => playGlitch());

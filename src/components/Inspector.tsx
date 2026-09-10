@@ -246,6 +246,74 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
               </div>
             )}
 
+            {/* News & Documentary specifics */}
+            {config.category === 'news' && (
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Documentary & Source Details
+                </label>
+                {config.locationText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Location Stamp</span>
+                    <input
+                      type="text"
+                      value={config.locationText}
+                      onChange={(e) => onChange({ locationText: e.target.value })}
+                      placeholder="KYIV, UKRAINE"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.dateText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Date / Timestamp Stamp</span>
+                    <input
+                      type="text"
+                      value={config.dateText}
+                      onChange={(e) => onChange({ dateText: e.target.value })}
+                      placeholder="OCTOBER 24, 2024"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.sourceCitation !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Source / Archive Citation</span>
+                    <input
+                      type="text"
+                      value={config.sourceCitation}
+                      onChange={(e) => onChange({ sourceCitation: e.target.value })}
+                      placeholder="National Security Archive"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.quoteText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Full Quotation Body</span>
+                    <textarea
+                      rows={3}
+                      value={config.quoteText}
+                      onChange={(e) => onChange({ quoteText: e.target.value })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.chapterNumber !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Chapter Tag</span>
+                    <input
+                      type="text"
+                      value={config.chapterNumber}
+                      onChange={(e) => onChange({ chapterNumber: e.target.value })}
+                      placeholder="CHAPTER 04"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Chart items list */}
             {config.chartData && (
               <div className="space-y-3 pt-3 border-t border-slate-800">
