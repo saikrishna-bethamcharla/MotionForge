@@ -211,6 +211,88 @@ export function playWhoosh(ctx: BaseAudioContext = getAudioContext(), dest: Audi
 }
 
 /**
+ * Creates audio nodes for an ultra-punchy bass logo sting impact (Brand Reveals, Stings)
+ */
+export function playSting(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(240, now);
+  osc.frequency.exponentialRampToValueAtTime(45, now + 0.35);
+
+  gain.gain.setValueAtTime(0.4, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1400, now);
+  filter.frequency.exponentialRampToValueAtTime(120, now + 0.4);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+
+  osc.start(now);
+  osc.stop(now + 0.48);
+}
+
+/**
+ * Creates audio nodes for a commercial cash register / purchase ding (Sales, Pricing, Discount)
+ */
+export function playCashRegister(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  // Bell chime + mechanical click
+  playClick(ctx, dest);
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1864.66, now + 0.03); // Bb6
+  gain.gain.setValueAtTime(0.3, now + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.start(now + 0.03);
+  osc.stop(now + 0.4);
+}
+
+/**
+ * Creates audio nodes for a crisp countdown clock tick
+ */
+export function playCountdownTick(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(950, now);
+  osc.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+
+  gain.gain.setValueAtTime(0.25, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.start(now);
+  osc.stop(now + 0.04);
+}
+
+/**
+ * Creates audio nodes for festive confetti pop
+ */
+export function playConfettiPop(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  playPop(ctx, dest);
+  setTimeout(() => {
+    try {
+      playStarChime(ctx, dest);
+    } catch (e) {}
+  }, 60);
+}
+
+/**
  * Sound triggers dispatcher based on template timeline progression
  */
 export class SFXManager {
@@ -287,8 +369,39 @@ export class SFXManager {
     if (templateId === 'quote-graphic' || templateId === 'according-to-graphic' || templateId === 'doc-timeline' || templateId === 'photo-collage') {
       if (progress >= 0.12) fireOnce('quote_reveal', () => playStarChime());
     }
-    if (templateId === 'cyberpunk-hud') {
-      if (progress >= 0.10) fireOnce('hud_glitch', () => playGlitch());
+    // Branding triggers
+    if (templateId.startsWith('brand-')) {
+      if (progress >= 0.08) fireOnce('brand_whoosh', () => playWhoosh());
+      if (progress >= 0.22) fireOnce('brand_sting', () => playSting());
+    }
+
+    // Creator triggers
+    if (templateId.startsWith('creator-')) {
+      if (templateId === 'creator-subscribe-cta' || templateId === 'creator-like-sub') {
+        if (progress >= 0.15) fireOnce('creator_sub', () => playClick());
+        if (progress >= 0.35) fireOnce('creator_bell', () => playBell());
+        if (progress >= 0.45) fireOnce('creator_confetti', () => playConfettiPop());
+      } else if (templateId === 'creator-countdown') {
+        if (progress >= 0.1) fireOnce('tick_1', () => playCountdownTick());
+        if (progress >= 0.3) fireOnce('tick_2', () => playCountdownTick());
+        if (progress >= 0.5) fireOnce('tick_3', () => playCountdownTick());
+        if (progress >= 0.7) fireOnce('tick_4', () => playCountdownTick());
+        if (progress >= 0.9) fireOnce('tick_5', () => playSting());
+      } else {
+        if (progress >= 0.08) fireOnce('creator_pop', () => playPop());
+      }
+    }
+
+    // Commercial triggers
+    if (templateId.startsWith('comm-')) {
+      if (templateId === 'comm-price-tag' || templateId === 'comm-discount-badge' || templateId === 'comm-sale-anim') {
+        if (progress >= 0.18) fireOnce('comm_cash', () => playCashRegister());
+      } else if (templateId === 'comm-product-reveal' || templateId === 'comm-app-reveal') {
+        if (progress >= 0.10) fireOnce('comm_whoosh', () => playWhoosh());
+        if (progress >= 0.30) fireOnce('comm_chime', () => playStarChime());
+      } else {
+        if (progress >= 0.12) fireOnce('comm_pop', () => playPop());
+      }
     }
   }
 }

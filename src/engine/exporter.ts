@@ -1,6 +1,18 @@
 import type { TemplateConfig, BackgroundMode, RenderContext } from '../types/template';
 import { TEMPLATES } from '../templates/registry';
-import { playPop, playClick, playBell, playHeart, playGlitch, playStarChime, playWhoosh } from './audio';
+import {
+  playPop,
+  playClick,
+  playBell,
+  playHeart,
+  playGlitch,
+  playStarChime,
+  playWhoosh,
+  playSting,
+  playCashRegister,
+  playCountdownTick,
+  playConfettiPop,
+} from './audio';
 
 export interface ExportOptions {
   config: TemplateConfig;
@@ -234,6 +246,38 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
       }
       if (templateId === 'cyberpunk-hud') {
         if (progress >= 0.10) trigger('hud_glitch', () => playGlitch(audioCtx!, audioDest!));
+      }
+      // Branding
+      if (templateId === 'brand-logo-sting') {
+        if (progress >= 0.15) trigger('sting', () => playSting(audioCtx!, audioDest!));
+      } else if (templateId.startsWith('brand-')) {
+        if (progress >= 0.08) trigger('brand_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+        if (progress >= 0.35) trigger('brand_chime', () => playStarChime(audioCtx!, audioDest!));
+      }
+      // Creator / YouTube
+      if (templateId === 'creator-countdown') {
+        if (progress >= 0.10) trigger('tick_1', () => playCountdownTick(audioCtx!, audioDest!));
+        if (progress >= 0.35) trigger('tick_2', () => playCountdownTick(audioCtx!, audioDest!));
+        if (progress >= 0.65) trigger('tick_3', () => playCountdownTick(audioCtx!, audioDest!));
+        if (progress >= 0.90) trigger('tick_end', () => playBell(audioCtx!, audioDest!));
+      } else if (templateId === 'creator-like-sub' || templateId === 'creator-subscribe-cta') {
+        if (progress >= 0.15) trigger('sub_pop', () => playPop(audioCtx!, audioDest!));
+        if (progress >= 0.35) trigger('sub_bell', () => playBell(audioCtx!, audioDest!));
+        if (progress >= 0.50) trigger('sub_confetti', () => playConfettiPop(audioCtx!, audioDest!));
+      } else if (templateId === 'creator-meme-popup' || templateId === 'creator-reaction-popup') {
+        if (progress >= 0.12) trigger('meme_pop', () => playPop(audioCtx!, audioDest!));
+      } else if (templateId.startsWith('creator-')) {
+        if (progress >= 0.08) trigger('creator_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+        if (progress >= 0.25) trigger('creator_click', () => playClick(audioCtx!, audioDest!));
+      }
+      // Commercial
+      if (templateId === 'comm-price-tag' || templateId === 'comm-discount-badge' || templateId === 'comm-sale-anim') {
+        if (progress >= 0.10) trigger('comm_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+        if (progress >= 0.32) trigger('cash_register', () => playCashRegister(audioCtx!, audioDest!));
+      } else if (templateId.startsWith('comm-')) {
+        if (progress >= 0.08) trigger('comm_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+        if (progress >= 0.28) trigger('comm_click', () => playClick(audioCtx!, audioDest!));
+        if (progress >= 0.55) trigger('comm_chime', () => playStarChime(audioCtx!, audioDest!));
       }
     }
 

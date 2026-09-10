@@ -314,6 +314,176 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
               </div>
             )}
 
+            {/* Branding specifics */}
+            {config.category === 'branding' && (
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Branding Details
+                </label>
+                {config.brandLogoText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Brand Monogram / Logo Mark</span>
+                    <input
+                      type="text"
+                      maxLength={4}
+                      value={config.brandLogoText}
+                      onChange={(e) => onChange({ brandLogoText: e.target.value })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.brandTagline !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Brand Tagline</span>
+                    <input
+                      type="text"
+                      value={config.brandTagline}
+                      onChange={(e) => onChange({ brandTagline: e.target.value })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.websiteUrl !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Website URL</span>
+                    <input
+                      type="text"
+                      value={config.websiteUrl}
+                      onChange={(e) => onChange({ websiteUrl: e.target.value })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.ctaText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Call To Action (CTA)</span>
+                    <input
+                      type="text"
+                      value={config.ctaText}
+                      onChange={(e) => onChange({ ctaText: e.target.value })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Commercial specifics */}
+            {config.category === 'commercial' && (
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Commercial & Pricing
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {config.productPrice !== undefined && (
+                    <div>
+                      <span className="text-xs text-slate-300 block mb-1">Current Price</span>
+                      <input
+                        type="text"
+                        value={config.productPrice}
+                        onChange={(e) => onChange({ productPrice: e.target.value })}
+                        placeholder="$299"
+                        className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+                  )}
+                  {config.originalPrice !== undefined && (
+                    <div>
+                      <span className="text-xs text-slate-300 block mb-1">Original Price</span>
+                      <input
+                        type="text"
+                        value={config.originalPrice}
+                        onChange={(e) => onChange({ originalPrice: e.target.value })}
+                        placeholder="$499"
+                        className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+                  )}
+                </div>
+                {config.discountPercent !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Discount Tag</span>
+                    <input
+                      type="text"
+                      value={config.discountPercent}
+                      onChange={(e) => onChange({ discountPercent: e.target.value })}
+                      placeholder="-40%"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.saleTitle !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Promo / Sale Header</span>
+                    <input
+                      type="text"
+                      value={config.saleTitle}
+                      onChange={(e) => onChange({ saleTitle: e.target.value })}
+                      placeholder="FLASH SALE"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.ctaText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Button / CTA Text</span>
+                    <input
+                      type="text"
+                      value={config.ctaText}
+                      onChange={(e) => onChange({ ctaText: e.target.value })}
+                      placeholder="SHOP NOW"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Creator specifics */}
+            {config.category === 'creator' && (
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Creator Details
+                </label>
+                {config.handle !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Handle</span>
+                    <input
+                      type="text"
+                      value={config.handle}
+                      onChange={(e) => onChange({ handle: e.target.value })}
+                      placeholder="@creator"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.subscriberCount !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Subscribers / Stats</span>
+                    <input
+                      type="text"
+                      value={config.subscriberCount}
+                      onChange={(e) => onChange({ subscriberCount: e.target.value })}
+                      placeholder="1.25M SUBSCRIBERS"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+                {config.ctaText !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Call to Action</span>
+                    <input
+                      type="text"
+                      value={config.ctaText}
+                      onChange={(e) => onChange({ ctaText: e.target.value })}
+                      placeholder="SUBSCRIBE"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Chart items list */}
             {config.chartData && (
               <div className="space-y-3 pt-3 border-t border-slate-800">

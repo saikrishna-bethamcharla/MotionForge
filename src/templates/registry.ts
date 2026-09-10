@@ -33,6 +33,11 @@ import {
   renderInterviewIdentifier,
   renderChapterHeading,
 } from './newsDocGraphics';
+import {
+  BRANDING_TEMPLATES,
+  CREATOR_TEMPLATES,
+  COMMERCIAL_TEMPLATES,
+} from './extraTemplates';
 
 export interface TemplateDefinition {
   id: string;
@@ -871,4 +876,7 @@ export const TEMPLATES: TemplateDefinition[] = [
       enableSFX: true,
     },
   },
+  ...BRANDING_TEMPLATES,
+  ...CREATOR_TEMPLATES,
+  ...COMMERCIAL_TEMPLATES,
 ];

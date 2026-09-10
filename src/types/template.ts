@@ -1,4 +1,4 @@
-export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social' | 'news';
+export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social' | 'news' | 'branding' | 'creator' | 'commercial';
 
 export type BackgroundMode = 'transparent' | 'greenscreen' | 'bluescreen' | 'dark' | 'light';
 
@@ -73,6 +73,18 @@ export interface TemplateConfig {
   highlightText?: string;
   chapterNumber?: string;
   timelineItems?: TimelineItem[];
+
+  // Branding / Creator / Commercial specific
+  brandLogoText?: string;
+  brandTagline?: string;
+  websiteUrl?: string;
+  ctaText?: string;
+  productPrice?: string;
+  originalPrice?: string;
+  discountPercent?: string;
+  saleTitle?: string;
+  countdownNumber?: number;
+  featuresList?: string[];
 }
 
 export interface RenderContext {
