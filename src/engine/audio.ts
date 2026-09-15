@@ -293,6 +293,101 @@ export function playConfettiPop(ctx: BaseAudioContext = getAudioContext(), dest:
 }
 
 /**
+ * Creates audio nodes for a crisp metallic coin clink / bounce
+ */
+export function playCoinClink(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const frequencies = [3400, 4800, 6200];
+  frequencies.forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq + (Math.random() - 0.5) * 120, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.88, now + 0.12);
+
+    const initialGain = 0.18 / (idx + 1);
+    gain.gain.setValueAtTime(initialGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14 + idx * 0.04);
+
+    osc.connect(gain);
+    gain.connect(dest);
+
+    osc.start(now);
+    osc.stop(now + 0.18 + idx * 0.04);
+  });
+}
+
+/**
+ * Creates audio nodes for cascading shower of coins
+ */
+export function playCoinShower(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      try {
+        playCoinClink(ctx, dest);
+      } catch (e) {}
+    }, i * 45 + Math.random() * 20);
+  }
+}
+
+/**
+ * Creates audio nodes for paper banknote rustle / counting
+ */
+export function playCashRustle(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const bufferSize = Math.floor(ctx.sampleRate * 0.12);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.4));
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(2400, now);
+  filter.Q.setValueAtTime(3, now);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.3, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(dest);
+
+  noise.start(now);
+}
+
+/**
+ * Creates audio nodes for a smooth modern payment chime (e.g. UPI / transaction success)
+ */
+export function playPaymentChime(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
+  const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+  notes.forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+    const noteTime = now + idx * 0.05;
+    gain.gain.setValueAtTime(0.2, noteTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.35);
+
+    osc.connect(gain);
+    gain.connect(dest);
+
+    osc.start(noteTime);
+    osc.stop(noteTime + 0.38);
+  });
+}
+
+/**
  * Sound triggers dispatcher based on template timeline progression
  */
 export class SFXManager {
@@ -401,6 +496,42 @@ export class SFXManager {
         if (progress >= 0.30) fireOnce('comm_chime', () => playStarChime());
       } else {
         if (progress >= 0.12) fireOnce('comm_pop', () => playPop());
+      }
+    }
+
+    // Money & Currency triggers
+    if (templateId.startsWith('money-')) {
+      if (templateId === 'money-coin-flip') {
+        if (progress >= 0.05) fireOnce('coin_whoosh', () => playWhoosh());
+        if (progress >= 0.35) fireOnce('coin_clink1', () => playCoinClink());
+        if (progress >= 0.50) fireOnce('coin_clink2', () => playCoinClink());
+      } else if (templateId === 'money-falling-coins') {
+        if (progress >= 0.08) fireOnce('coin_shower', () => playCoinShower());
+      } else if (templateId === 'money-banknote-stack') {
+        if (progress >= 0.10) fireOnce('cash_rustle', () => playCashRustle());
+        if (progress >= 0.35) fireOnce('stack_thud', () => playClick());
+      } else if (templateId === 'money-rupee-title') {
+        if (progress >= 0.08) fireOnce('rupee_whoosh', () => playWhoosh());
+        if (progress >= 0.25) fireOnce('rupee_sting', () => playSting());
+        if (progress >= 0.45) fireOnce('rupee_chime', () => playStarChime());
+      } else if (templateId === 'money-wealth-counter') {
+        if (progress >= 0.15) fireOnce('tick_m1', () => playCountdownTick());
+        if (progress >= 0.35) fireOnce('tick_m2', () => playCountdownTick());
+        if (progress >= 0.60) fireOnce('tick_m3', () => playCountdownTick());
+        if (progress >= 0.85) fireOnce('wealth_cash', () => playCashRegister());
+      } else if (templateId === 'money-cash-explosion') {
+        if (progress >= 0.12) fireOnce('exp_sting', () => playSting());
+        if (progress >= 0.20) fireOnce('exp_coins', () => playCoinShower());
+        if (progress >= 0.35) fireOnce('exp_register', () => playCashRegister());
+      } else if (templateId === 'money-transaction-pill') {
+        if (progress >= 0.10) fireOnce('tx_whoosh', () => playWhoosh());
+        if (progress >= 0.30) fireOnce('tx_payment', () => playPaymentChime());
+      } else if (templateId === 'money-piggy-bank') {
+        if (progress >= 0.15) fireOnce('piggy_drop', () => playCoinClink());
+        if (progress >= 0.45) fireOnce('piggy_chime', () => playStarChime());
+      } else {
+        if (progress >= 0.08) fireOnce('money_pop', () => playPop());
+        if (progress >= 0.30) fireOnce('money_clink', () => playCoinClink());
       }
     }
   }

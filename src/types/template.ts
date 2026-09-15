@@ -1,4 +1,4 @@
-export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social' | 'news' | 'branding' | 'creator' | 'commercial';
+export type TemplateCategory = 'chart' | 'metric' | 'title' | 'social' | 'news' | 'branding' | 'creator' | 'commercial' | 'money';
 
 export type BackgroundMode = 'transparent' | 'greenscreen' | 'bluescreen' | 'dark' | 'light';
 
@@ -85,6 +85,11 @@ export interface TemplateConfig {
   saleTitle?: string;
   countdownNumber?: number;
   featuresList?: string[];
+
+  // Money & Wealth specific
+  currencySymbol?: string;
+  amountNumber?: number;
+  denomination?: string;
 }
 
 export interface RenderContext {

@@ -42,6 +42,9 @@ import {
   Award,
   Flame,
   CheckCircle2,
+  Coins,
+  Banknote,
+  IndianRupee,
 } from 'lucide-react';
 
 interface TemplateSelectorProps {
@@ -53,6 +56,7 @@ type FilterCategory = 'all' | TemplateCategory;
 
 const CATEGORY_TABS: { id: FilterCategory; label: string; icon: React.ReactNode }[] = [
   { id: 'all', label: 'All Templates', icon: <Layers className="w-3.5 h-3.5" /> },
+  { id: 'money', label: 'Money & Wealth', icon: <Coins className="w-3.5 h-3.5 text-yellow-400" /> },
   { id: 'branding', label: 'Branding', icon: <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> },
   { id: 'creator', label: 'YouTube & Creator', icon: <PlaySquare className="w-3.5 h-3.5 text-red-500" /> },
   { id: 'commercial', label: 'Commercial & Ads', icon: <ShoppingBag className="w-3.5 h-3.5 text-emerald-400" /> },
@@ -140,6 +144,17 @@ const ICONS: Record<string, React.ReactNode> = {
   'comm-app-reveal': <Layers className="w-4 h-4 text-sky-400" />,
   'comm-qr-code': <QrCode className="w-4 h-4 text-emerald-400" />,
   'comm-testimonial-card': <Star className="w-4 h-4 text-amber-400 fill-amber-400/20" />,
+  // Money & Currency
+  'money-coin-flip': <Coins className="w-4 h-4 text-yellow-400" />,
+  'money-falling-coins': <Coins className="w-4 h-4 text-amber-300" />,
+  'money-banknote-stack': <Banknote className="w-4 h-4 text-emerald-400" />,
+  'money-rupee-title': <IndianRupee className="w-4 h-4 text-yellow-400" />,
+  'money-wealth-counter': <TrendingUp className="w-4 h-4 text-green-400" />,
+  'money-cash-explosion': <Flame className="w-4 h-4 text-red-500" />,
+  'money-crypto-coin': <CircleDot className="w-4 h-4 text-indigo-400" />,
+  'money-piggy-bank': <Award className="w-4 h-4 text-cyan-400" />,
+  'money-transaction-pill': <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+  'money-net-worth': <Layers className="w-4 h-4 text-amber-400" />,
 };
 
 export const TemplateSelector: React.FC<TemplateSelectorProps> = ({

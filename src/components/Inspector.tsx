@@ -484,6 +484,51 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
               </div>
             )}
 
+            {/* Money & Wealth specifics */}
+            {config.category === 'money' && (
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Money & Currency Controls
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Currency Symbol</span>
+                    <input
+                      type="text"
+                      maxLength={4}
+                      value={config.currencySymbol || '₹'}
+                      onChange={(e) => onChange({ currencySymbol: e.target.value })}
+                      placeholder="₹"
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                  {config.denomination !== undefined && (
+                    <div>
+                      <span className="text-xs text-slate-300 block mb-1">Denomination</span>
+                      <input
+                        type="text"
+                        value={config.denomination}
+                        onChange={(e) => onChange({ denomination: e.target.value })}
+                        placeholder="500"
+                        className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+                  )}
+                </div>
+                {config.amountNumber !== undefined && (
+                  <div>
+                    <span className="text-xs text-slate-300 block mb-1">Numeric Target Amount</span>
+                    <input
+                      type="number"
+                      value={config.amountNumber}
+                      onChange={(e) => onChange({ amountNumber: parseFloat(e.target.value) || 0 })}
+                      className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Chart items list */}
             {config.chartData && (
               <div className="space-y-3 pt-3 border-t border-slate-800">

@@ -37,6 +37,7 @@ import {
   BRANDING_TEMPLATES,
   CREATOR_TEMPLATES,
   COMMERCIAL_TEMPLATES,
+  MONEY_TEMPLATES,
 } from './extraTemplates';
 
 export interface TemplateDefinition {
@@ -879,4 +880,5 @@ export const TEMPLATES: TemplateDefinition[] = [
   ...BRANDING_TEMPLATES,
   ...CREATOR_TEMPLATES,
   ...COMMERCIAL_TEMPLATES,
+  ...MONEY_TEMPLATES,
 ];

@@ -12,6 +12,10 @@ import {
   playCashRegister,
   playCountdownTick,
   playConfettiPop,
+  playCoinClink,
+  playCoinShower,
+  playCashRustle,
+  playPaymentChime,
 } from './audio';
 
 export interface ExportOptions {
@@ -278,6 +282,41 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
         if (progress >= 0.08) trigger('comm_whoosh', () => playWhoosh(audioCtx!, audioDest!));
         if (progress >= 0.28) trigger('comm_click', () => playClick(audioCtx!, audioDest!));
         if (progress >= 0.55) trigger('comm_chime', () => playStarChime(audioCtx!, audioDest!));
+      }
+      // Money & Currency
+      if (templateId.startsWith('money-')) {
+        if (templateId === 'money-coin-flip') {
+          if (progress >= 0.05) trigger('coin_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.35) trigger('coin_clink1', () => playCoinClink(audioCtx!, audioDest!));
+          if (progress >= 0.50) trigger('coin_clink2', () => playCoinClink(audioCtx!, audioDest!));
+        } else if (templateId === 'money-falling-coins') {
+          if (progress >= 0.08) trigger('coin_shower', () => playCoinShower(audioCtx!, audioDest!));
+        } else if (templateId === 'money-banknote-stack') {
+          if (progress >= 0.10) trigger('cash_rustle', () => playCashRustle(audioCtx!, audioDest!));
+          if (progress >= 0.35) trigger('stack_thud', () => playClick(audioCtx!, audioDest!));
+        } else if (templateId === 'money-rupee-title') {
+          if (progress >= 0.08) trigger('rupee_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.25) trigger('rupee_sting', () => playSting(audioCtx!, audioDest!));
+          if (progress >= 0.45) trigger('rupee_chime', () => playStarChime(audioCtx!, audioDest!));
+        } else if (templateId === 'money-wealth-counter') {
+          if (progress >= 0.15) trigger('tick_m1', () => playCountdownTick(audioCtx!, audioDest!));
+          if (progress >= 0.35) trigger('tick_m2', () => playCountdownTick(audioCtx!, audioDest!));
+          if (progress >= 0.60) trigger('tick_m3', () => playCountdownTick(audioCtx!, audioDest!));
+          if (progress >= 0.85) trigger('wealth_cash', () => playCashRegister(audioCtx!, audioDest!));
+        } else if (templateId === 'money-cash-explosion') {
+          if (progress >= 0.12) trigger('exp_sting', () => playSting(audioCtx!, audioDest!));
+          if (progress >= 0.20) trigger('exp_coins', () => playCoinShower(audioCtx!, audioDest!));
+          if (progress >= 0.35) trigger('exp_register', () => playCashRegister(audioCtx!, audioDest!));
+        } else if (templateId === 'money-transaction-pill') {
+          if (progress >= 0.10) trigger('tx_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.30) trigger('tx_payment', () => playPaymentChime(audioCtx!, audioDest!));
+        } else if (templateId === 'money-piggy-bank') {
+          if (progress >= 0.15) trigger('piggy_drop', () => playCoinClink(audioCtx!, audioDest!));
+          if (progress >= 0.45) trigger('piggy_chime', () => playStarChime(audioCtx!, audioDest!));
+        } else {
+          if (progress >= 0.08) trigger('money_pop', () => playPop(audioCtx!, audioDest!));
+          if (progress >= 0.30) trigger('money_clink', () => playCoinClink(audioCtx!, audioDest!));
+        }
       }
     }
 
