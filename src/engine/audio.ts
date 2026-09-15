@@ -239,24 +239,72 @@ export function playSting(ctx: BaseAudioContext = getAudioContext(), dest: Audio
 }
 
 /**
- * Creates audio nodes for a commercial cash register / purchase ding (Sales, Pricing, Discount)
+ * Creates audio nodes for an authentic mechanical cash register "Ka-Ching!"
+ * Features a heavy mechanical latch thud, coin drawer slide, and twin brass bells.
  */
 export function playCashRegister(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
   const now = ctx.currentTime;
-  // Bell chime + mechanical click
-  playClick(ctx, dest);
 
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(1864.66, now + 0.03); // Bb6
-  gain.gain.setValueAtTime(0.3, now + 0.03);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+  // 1. Mechanical Latch Thud & Click
+  const clickOsc = ctx.createOscillator();
+  const clickGain = ctx.createGain();
+  clickOsc.type = 'triangle';
+  clickOsc.frequency.setValueAtTime(320, now);
+  clickOsc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+  clickGain.gain.setValueAtTime(0.4, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+  clickOsc.connect(clickGain);
+  clickGain.connect(dest);
+  clickOsc.start(now);
+  clickOsc.stop(now + 0.07);
 
-  osc.connect(gain);
-  gain.connect(dest);
-  osc.start(now + 0.03);
-  osc.stop(now + 0.4);
+  // 2. Drawer Open Metal Slide / Friction
+  const slideDur = 0.08;
+  const slideBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * slideDur), ctx.sampleRate);
+  const slideData = slideBuf.getChannelData(0);
+  for (let i = 0; i < slideData.length; i++) {
+    slideData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (slideData.length * 0.5));
+  }
+  const slideSrc = ctx.createBufferSource();
+  slideSrc.buffer = slideBuf;
+  const slideFilter = ctx.createBiquadFilter();
+  slideFilter.type = 'bandpass';
+  slideFilter.frequency.setValueAtTime(3200, now);
+  slideFilter.Q.setValueAtTime(4, now);
+  const slideGain = ctx.createGain();
+  slideGain.gain.setValueAtTime(0.2, now);
+  slideGain.gain.exponentialRampToValueAtTime(0.001, now + slideDur);
+  slideSrc.connect(slideFilter);
+  slideFilter.connect(slideGain);
+  slideGain.connect(dest);
+  slideSrc.start(now);
+
+  // 3. Iconic Dual Bell Strike "Ka-Ching!" (strike 1 at +35ms, strike 2 at +85ms)
+  const bellFrequencies = [
+    { freq: 2093.0, timeOffset: 0.035, gainVal: 0.35, decay: 0.55 }, // C7
+    { freq: 3135.9, timeOffset: 0.035, gainVal: 0.15, decay: 0.35 }, // G7 harmonic
+    { freq: 2637.0, timeOffset: 0.085, gainVal: 0.40, decay: 0.65 }, // E7 second strike
+    { freq: 4186.0, timeOffset: 0.085, gainVal: 0.18, decay: 0.40 }, // C8 shimmer
+  ];
+
+  bellFrequencies.forEach(({ freq, timeOffset, gainVal, decay }) => {
+    const t = now + timeOffset;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.995, t + decay);
+
+    g.gain.setValueAtTime(gainVal, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+
+    osc.connect(g);
+    g.connect(dest);
+
+    osc.start(t);
+    osc.stop(t + decay + 0.02);
+  });
 }
 
 /**
@@ -293,98 +341,159 @@ export function playConfettiPop(ctx: BaseAudioContext = getAudioContext(), dest:
 }
 
 /**
- * Creates audio nodes for a crisp metallic coin clink / bounce
+ * Creates audio nodes for an authentic acoustic metallic coin clink / bounce.
+ * Models four inharmonic resonance modes of solid brass/nickel coins:
+ * - High-speed transient contact click
+ * - Realistic metallic ping at 4.2kHz, 6.1kHz, 8.4kHz, 11.3kHz
+ * - Natural exponential damping
  */
 export function playCoinClink(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
   const now = ctx.currentTime;
-  const frequencies = [3400, 4800, 6200];
-  frequencies.forEach((freq, idx) => {
+
+  // 1. Initial High-Frequency Contact Impact (metal-on-metal transient)
+  const transientOsc = ctx.createOscillator();
+  const transientGain = ctx.createGain();
+  transientOsc.type = 'triangle';
+  transientOsc.frequency.setValueAtTime(8000, now);
+  transientOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.008);
+  transientGain.gain.setValueAtTime(0.45, now);
+  transientGain.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+  transientOsc.connect(transientGain);
+  transientGain.connect(dest);
+  transientOsc.start(now);
+  transientOsc.stop(now + 0.015);
+
+  // 2. Physical Inharmonic Modes of a Thin Metallic Disc
+  // Solid coins exhibit non-integer modal ratios (~1.0, 1.44, 1.98, 2.65)
+  const baseFreq = 4250 + (Math.random() - 0.5) * 160;
+  const modes = [
+    { freqRatio: 1.00, gain: 0.35, decay: 0.22 },  // Fundamental ping
+    { freqRatio: 1.44, gain: 0.25, decay: 0.16 },  // Second nodal mode
+    { freqRatio: 1.98, gain: 0.18, decay: 0.11 },  // Third overtone
+    { freqRatio: 2.65, gain: 0.12, decay: 0.07 },  // Rim ring
+  ];
+
+  modes.forEach(({ freqRatio, gain: gVal, decay }) => {
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    const g = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq + (Math.random() - 0.5) * 120, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.88, now + 0.12);
+    const targetFreq = baseFreq * freqRatio;
+    osc.frequency.setValueAtTime(targetFreq, now);
+    // Micro wobble simulating coin settle
+    osc.frequency.linearRampToValueAtTime(targetFreq * 0.992, now + decay);
 
-    const initialGain = 0.18 / (idx + 1);
-    gain.gain.setValueAtTime(initialGain, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14 + idx * 0.04);
+    g.gain.setValueAtTime(gVal, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-    osc.connect(gain);
-    gain.connect(dest);
+    osc.connect(g);
+    g.connect(dest);
 
     osc.start(now);
-    osc.stop(now + 0.18 + idx * 0.04);
+    osc.stop(now + decay + 0.02);
   });
 }
 
 /**
- * Creates audio nodes for cascading shower of coins
+ * Creates audio nodes for a realistic cascade / shower of tumbling coins.
+ * Generates 16 overlapping coin strikes with varied pitch, bounce intervals, and stereo depth.
  */
 export function playCoinShower(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
-  for (let i = 0; i < 5; i++) {
+  const count = 16;
+  for (let i = 0; i < count; i++) {
+    // Clustered early, rolling off smoothly like real spilled coins
+    const delay = Math.pow(i / count, 1.3) * 380 + Math.random() * 30;
     setTimeout(() => {
       try {
         playCoinClink(ctx, dest);
       } catch (e) {}
-    }, i * 45 + Math.random() * 20);
+    }, delay);
   }
 }
 
 /**
- * Creates audio nodes for paper banknote rustle / counting
+ * Creates audio nodes for authentic banknote fanning / crisp counting (shhk-shhk-shhk).
+ * Simulates high-speed thumb fanning through freshly minted polymer/cotton currency notes.
  */
 export function playCashRustle(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
   const now = ctx.currentTime;
-  const bufferSize = Math.floor(ctx.sampleRate * 0.12);
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.4));
+  const countRips = 4; // 4 rapid note flicks
+
+  for (let flick = 0; flick < countRips; flick++) {
+    const flickTime = now + flick * 0.065;
+    const dur = 0.055;
+    const bufSize = Math.floor(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+
+    // Filtered paper friction envelope
+    for (let i = 0; i < bufSize; i++) {
+      const envelope = Math.sin((i / bufSize) * Math.PI);
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    // Dual filtering for distinct "crisp paper" bite
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.setValueAtTime(4500 + flick * 300, flickTime);
+    bandpass.Q.setValueAtTime(2.5, flickTime);
+
+    const highpass = ctx.createBiquadFilter();
+    highpass.type = 'highpass';
+    highpass.frequency.setValueAtTime(2200, flickTime);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.42, flickTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, flickTime + dur);
+
+    src.connect(bandpass);
+    bandpass.connect(highpass);
+    highpass.connect(gain);
+    gain.connect(dest);
+
+    src.start(flickTime);
   }
+}
 
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
+/**
+ * Creates audio nodes for the iconic Indian UPI / Soundbox payment confirmation tone.
+ * Harmonic two-stage confirmation: A5 (880Hz) followed by E6 (1318Hz) + sparkling shimmer.
+ */
+export function playIndianPaymentTone(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
+  const now = ctx.currentTime;
 
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass';
-  filter.frequency.setValueAtTime(2400, now);
-  filter.Q.setValueAtTime(3, now);
+  const notes = [
+    { freq: 880.0, time: now, dur: 0.18, gain: 0.32 },        // A5
+    { freq: 1318.51, time: now + 0.14, dur: 0.45, gain: 0.40 }, // E6
+    { freq: 1760.0, time: now + 0.14, dur: 0.35, gain: 0.18 },  // A6 shimmer
+  ];
 
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.3, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+  notes.forEach(({ freq, time, dur, gain: gVal }) => {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
 
-  noise.connect(filter);
-  filter.connect(gain);
-  gain.connect(dest);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, time);
 
-  noise.start(now);
+    g.gain.setValueAtTime(gVal, time);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+
+    osc.connect(g);
+    g.connect(dest);
+
+    osc.start(time);
+    osc.stop(time + dur + 0.02);
+  });
 }
 
 /**
  * Creates audio nodes for a smooth modern payment chime (e.g. UPI / transaction success)
  */
 export function playPaymentChime(ctx: BaseAudioContext = getAudioContext(), dest: AudioNode = ctx.destination) {
-  const now = ctx.currentTime;
-  const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-  notes.forEach((freq, idx) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now + idx * 0.05);
-
-    const noteTime = now + idx * 0.05;
-    gain.gain.setValueAtTime(0.2, noteTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.35);
-
-    osc.connect(gain);
-    gain.connect(dest);
-
-    osc.start(noteTime);
-    osc.stop(noteTime + 0.38);
-  });
+  playIndianPaymentTone(ctx, dest);
 }
 
 /**
@@ -507,9 +616,18 @@ export class SFXManager {
         if (progress >= 0.50) fireOnce('coin_clink2', () => playCoinClink());
       } else if (templateId === 'money-falling-coins') {
         if (progress >= 0.08) fireOnce('coin_shower', () => playCoinShower());
-      } else if (templateId === 'money-banknote-stack') {
-        if (progress >= 0.10) fireOnce('cash_rustle', () => playCashRustle());
-        if (progress >= 0.35) fireOnce('stack_thud', () => playClick());
+      } else if (templateId === 'money-banknote-stack' || templateId === 'money-indian-notes-bundle') {
+        if (progress >= 0.08) fireOnce('cash_whoosh', () => playWhoosh());
+        if (progress >= 0.18) fireOnce('cash_rustle', () => playCashRustle());
+        if (progress >= 0.38) fireOnce('bundle_thud', () => playClick());
+      } else if (templateId === 'money-cash-fanning') {
+        if (progress >= 0.08) fireOnce('fan_whoosh', () => playWhoosh());
+        if (progress >= 0.16) fireOnce('fan_rustle1', () => playCashRustle());
+        if (progress >= 0.30) fireOnce('fan_rustle2', () => playCashRustle());
+      } else if (templateId === 'money-indian-note-showcase') {
+        if (progress >= 0.08) fireOnce('note_whoosh', () => playWhoosh());
+        if (progress >= 0.22) fireOnce('note_rustle', () => playCashRustle());
+        if (progress >= 0.35) fireOnce('note_chime', () => playStarChime());
       } else if (templateId === 'money-rupee-title') {
         if (progress >= 0.08) fireOnce('rupee_whoosh', () => playWhoosh());
         if (progress >= 0.25) fireOnce('rupee_sting', () => playSting());

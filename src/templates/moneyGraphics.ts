@@ -248,20 +248,327 @@ export function renderMoneyFallingCoins(rc: RenderContext) {
   ctx.restore();
 }
 
+export interface IndianNoteStyle {
+  denom: '2000' | '500' | '200' | '100' | '50';
+  baseColor: string;
+  darkColor: string;
+  trimColor: string;
+  accentGlow: string;
+  hindiWord: string;
+  englishWord: string;
+  themeMotif: string;
+  bleedLines: number;
+}
+
+export const INDIAN_NOTE_STYLES: Record<string, IndianNoteStyle> = {
+  '2000': {
+    denom: '2000',
+    baseColor: '#db2777', // Magenta / Pink
+    darkColor: '#831843',
+    trimColor: '#fbcfe8',
+    accentGlow: '#f472b6',
+    hindiWord: 'दो हज़ार रुपये',
+    englishWord: 'TWO THOUSAND RUPEES',
+    themeMotif: 'MANGALYAAN / SPECIMEN',
+    bleedLines: 7,
+  },
+  '500': {
+    denom: '500',
+    baseColor: '#475569', // Stone Grey / Sage
+    darkColor: '#1e293b',
+    trimColor: '#cbd5e1',
+    accentGlow: '#22c55e', // Green optically variable ink
+    hindiWord: 'पाँच सौ रुपये',
+    englishWord: 'FIVE HUNDRED RUPEES',
+    themeMotif: 'RED FORT / SPECIMEN',
+    bleedLines: 5,
+  },
+  '200': {
+    denom: '200',
+    baseColor: '#ea580c', // Bright Orange
+    darkColor: '#9a3412',
+    trimColor: '#ffedd5',
+    accentGlow: '#facc15',
+    hindiWord: 'दो सौ रुपये',
+    englishWord: 'TWO HUNDRED RUPEES',
+    themeMotif: 'SANCHI STUPA / SPECIMEN',
+    bleedLines: 4,
+  },
+  '100': {
+    denom: '100',
+    baseColor: '#7c3aed', // Lavender / Violet
+    darkColor: '#4c1d95',
+    trimColor: '#ede9fe',
+    accentGlow: '#a78bfa',
+    hindiWord: 'एक सौ रुपये',
+    englishWord: 'ONE HUNDRED RUPEES',
+    themeMotif: 'RANI KI VAV / SPECIMEN',
+    bleedLines: 4,
+  },
+  '50': {
+    denom: '50',
+    baseColor: '#0284c7', // Fluorescent Cyan
+    darkColor: '#075985',
+    trimColor: '#e0f2fe',
+    accentGlow: '#38bdf8',
+    hindiWord: 'पचास रुपये',
+    englishWord: 'FIFTY RUPEES',
+    themeMotif: 'HAMPI CHARIOT / SPECIMEN',
+    bleedLines: 0,
+  },
+};
+
+/**
+ * Draws a highly authentic Indian Specimen/Prop Currency Note
+ * Features:
+ * - Guilloche geometric border lace
+ * - Color-shifting windowed security thread (green-to-blue)
+ * - Mahatma Gandhi portrait vignette
+ * - Ashoka Lion Pillar Capital emblem
+ * - RBI Governor guarantee clause & bilingual value
+ * - Explicit "SPECIMEN • FOR ENTERTAINMENT PURPOSE ONLY" markings
+ */
+export function drawIndianBanknote(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  w: number,
+  h: number,
+  denomKey = '500',
+  customPrimary?: string,
+  customSecondary?: string,
+  tiltAngle = 0,
+  serialNum = '9AB 742168'
+) {
+  const noteInfo = INDIAN_NOTE_STYLES[denomKey] || INDIAN_NOTE_STYLES['500'];
+  const baseColor = customPrimary || noteInfo.baseColor;
+  const darkColor = customSecondary || noteInfo.darkColor;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (tiltAngle !== 0) {
+    ctx.rotate(tiltAngle);
+  }
+
+  // 1. Banknote Body with Outer Drop Shadow
+  roundRect(ctx, -w / 2, -h / 2, w, h, 8);
+  const bodyGrad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+  bodyGrad.addColorStop(0, baseColor);
+  bodyGrad.addColorStop(0.5, darkColor);
+  bodyGrad.addColorStop(1, baseColor);
+  ctx.fillStyle = bodyGrad;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 10;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // 2. Micro-Guilloche Security Border Lace
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, -w / 2 + 8, -h / 2 + 8, w - 16, h - 16, 6);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, -w / 2 + 14, -h / 2 + 14, w - 28, h - 28, 4);
+  ctx.stroke();
+
+  // 3. Bleed Lines on Left and Right for Visually Impaired
+  if (noteInfo.bleedLines > 0) {
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    for (let b = 0; b < noteInfo.bleedLines; b++) {
+      const ly = -h * 0.25 + b * 14;
+      // Left edge marks
+      ctx.beginPath();
+      ctx.moveTo(-w / 2 + 10, ly);
+      ctx.lineTo(-w / 2 + 22, ly + 8);
+      ctx.stroke();
+      // Right edge marks
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 10, ly);
+      ctx.lineTo(w / 2 - 22, ly + 8);
+      ctx.stroke();
+    }
+  }
+
+  // 4. Color-Shifting Security Thread (Windowed Green/Blue Foil Ribbon)
+  const threadX = -w * 0.08;
+  const threadW = 8;
+  const threadGrad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+  threadGrad.addColorStop(0, '#22c55e');
+  threadGrad.addColorStop(0.3, '#3b82f6');
+  threadGrad.addColorStop(0.6, '#22c55e');
+  threadGrad.addColorStop(1, '#06b6d4');
+  ctx.fillStyle = threadGrad;
+  // Windowed dashes
+  for (let dy = -h / 2 + 16; dy < h / 2 - 20; dy += 24) {
+    ctx.fillRect(threadX, dy, threadW, 14);
+  }
+  // Micro RBI lettering in thread
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 8px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('RBI ₹', threadX + threadW / 2, 0);
+
+  // 5. Watermark Window Oval (Left Section)
+  const ovalX = -w * 0.31;
+  const ovalY = 0;
+  const ovalR = h * 0.32;
+  ctx.beginPath();
+  ctx.arc(ovalX, ovalY, ovalR, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Subtle watermark Gandhi silhouette inside oval
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(ovalX, ovalY, ovalR, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.beginPath();
+  ctx.arc(ovalX, ovalY - 10, 26, 0, Math.PI * 2); // head
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(ovalX, ovalY + 36, 42, 28, 0, 0, Math.PI * 2); // shoulder
+  ctx.fill();
+  ctx.restore();
+
+  // Watermark Denomination
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 ${h * 0.2}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(noteInfo.denom, ovalX, ovalY);
+
+  // 6. Header Text: "भारतीय रिज़र्व बैंक / RESERVE BANK OF INDIA"
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('भारतीय रिज़र्व बैंक  •  RESERVE BANK OF INDIA', 0, -h / 2 + 18);
+
+  ctx.font = 'bold 9px monospace';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.fillText('GUARANTEED BY THE CENTRAL GOVERNMENT // PROPOSAL SAMPLE', 0, -h / 2 + 34);
+
+  // 7. Mahatma Gandhi Portrait Vignette (Right-Center)
+  const portraitX = w * 0.18;
+  const portraitY = 4;
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(portraitX, portraitY, 48, 62, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Stylized Gandhi Head with round spectacles
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.beginPath();
+  ctx.arc(portraitX, portraitY - 14, 22, 0, Math.PI * 2); // head
+  ctx.fill();
+  // Round spectacles
+  ctx.strokeStyle = '#0f172a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(portraitX - 7, portraitY - 14, 6, 0, Math.PI * 2);
+  ctx.arc(portraitX + 7, portraitY - 14, 6, 0, Math.PI * 2);
+  ctx.stroke();
+  // Shawl draped shoulders
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.beginPath();
+  ctx.ellipse(portraitX, portraitY + 28, 38, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Name tag under portrait
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 8px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('महात्मा गांधी  MAHATMA GANDHI', portraitX, portraitY + 70);
+
+  // 8. Ashoka Lion Pillar Capital Emblem (Far Right)
+  const emblemX = w * 0.41;
+  const emblemY = h * 0.24;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.font = 'bold 24px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏛️', emblemX, emblemY);
+  ctx.font = 'bold 7px system-ui';
+  ctx.fillText('सत्यमेव जयते', emblemX, emblemY + 18);
+
+  // 9. Bilingual Value in Center: "दो हज़ार रुपये / TWO THOUSAND RUPEES"
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(noteInfo.hindiWord, -w * 0.03, -12);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 11px system-ui, -apple-system, sans-serif';
+  ctx.fillText(noteInfo.englishWord, -w * 0.03, 10);
+
+  // 10. Large Denomination Display (Top Right & Bottom Left)
+  // Top right green/gold variable ink numeral
+  ctx.fillStyle = noteInfo.accentGlow;
+  ctx.font = `900 32px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.shadowColor = noteInfo.accentGlow;
+  ctx.shadowBlur = 10;
+  ctx.fillText(`₹${noteInfo.denom}`, w / 2 - 24, -h / 2 + 42);
+  ctx.shadowBlur = 0;
+
+  // Bottom left numeral
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  ctx.fillText(`₹${noteInfo.denom}`, -w / 2 + 24, h / 2 - 28);
+
+  // 11. Red Serial Number (Ascending font size)
+  ctx.fillStyle = '#ef4444';
+  ctx.font = 'bold 12px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(serialNum, -w / 2 + 24, -h / 2 + 40);
+
+  ctx.textAlign = 'right';
+  ctx.fillText(serialNum, w / 2 - 24, h / 2 - 26);
+
+  // 12. PROMINENT SPECIMEN / PROP STAMP (Clearly authentic look yet compliant)
+  ctx.save();
+  ctx.rotate(-0.16);
+  ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
+  ctx.lineWidth = 2.5;
+  ctx.strokeRect(-w * 0.32, -18, w * 0.64, 36);
+
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
+  ctx.font = '900 15px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('SPECIMEN • FULL ENTERTAINMENT PURPOSE ONLY', 0, 0);
+  ctx.restore();
+
+  ctx.restore();
+}
+
 // ==========================================
-// 3. FLOATING BANKNOTE STACK
+// 3. FLOATING BANKNOTE STACK (INDIAN CURRENCY)
 // ==========================================
 export function renderMoneyBanknoteStack(rc: RenderContext) {
   const { ctx, width, height, progress, config } = rc;
   const scale = width / 1920;
 
   const cx = width / 2;
-  const cy = height / 2 - 30 * scale;
+  const cy = height / 2 - 40 * scale;
 
-  const noteW = 460 * scale;
-  const noteH = 220 * scale;
-  const symbol = config.currencySymbol || '₹';
-  const denom = config.denomination || '500';
+  const noteW = 540 * scale;
+  const noteH = 250 * scale;
+  const denom = (config.denomination as any) || '500';
 
   const enterProg = windowProgress(progress, 0, 0.15, Easing.easeOutQuart);
   const alpha = windowProgress(progress, 0, 0.08, Easing.easeOutQuad);
@@ -269,85 +576,51 @@ export function renderMoneyBanknoteStack(rc: RenderContext) {
   ctx.save();
   ctx.globalAlpha = alpha;
 
-  const notesCount = 5;
+  // Stack of 6 crisp notes
+  const notesCount = 6;
   for (let i = notesCount - 1; i >= 0; i--) {
     const noteProg = windowProgress(
       progress,
-      0.05 + i * 0.04,
-      0.25 + i * 0.04,
+      0.04 + i * 0.035,
+      0.22 + i * 0.035,
       Easing.easeOutBack
     );
-    const floatOffset = Math.sin(progress * Math.PI * 2 + i * 0.6) * 8 * scale;
-    const yOffset = (i * -26 + floatOffset) * scale;
-    const rot = (i - 2) * 0.035;
+    const floatOffset = Math.sin(progress * Math.PI * 2 + i * 0.5) * 10 * scale;
+    const yOffset = (i * -24 + floatOffset) * scale;
+    const rot = (i - 2.5) * 0.032;
 
     ctx.save();
-    ctx.translate(cx, cy + yOffset);
-    ctx.rotate(rot);
-    ctx.scale(noteProg * enterProg, noteProg * enterProg);
-
-    roundRect(ctx, -noteW / 2, -noteH / 2, noteW, noteH, 12 * scale);
-    const billGrad = ctx.createLinearGradient(-noteW / 2, -noteH / 2, noteW / 2, noteH / 2);
-    billGrad.addColorStop(0, config.primaryColor || '#0d9488');
-    billGrad.addColorStop(1, config.secondaryColor || '#115e59');
-    ctx.fillStyle = billGrad;
-    ctx.shadowColor = 'rgba(0,0,0,0.45)';
-    ctx.shadowBlur = 18 * scale;
-    ctx.shadowOffsetY = 8 * scale;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-    ctx.lineWidth = 2 * scale;
-    roundRect(ctx, -noteW / 2 + 10 * scale, -noteH / 2 + 10 * scale, noteW - 20 * scale, noteH - 20 * scale, 8 * scale);
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(254, 240, 138, 0.7)';
-    ctx.fillRect(noteW * 0.12, -noteH / 2 + 10 * scale, 10 * scale, noteH - 20 * scale);
-
-    ctx.beginPath();
-    ctx.arc(-noteW * 0.22, 0, 48 * scale, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.lineWidth = 3 * scale;
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `900 ${44 * scale}px system-ui, -apple-system, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${symbol}${denom}`, -noteW * 0.22, 0);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = `bold ${16 * scale}px monospace`;
-    ctx.textAlign = 'right';
-    ctx.fillText('RESERVE BANK OF INDIA', noteW / 2 - 24 * scale, -noteH / 2 + 32 * scale);
-
-    ctx.font = `bold ${13 * scale}px system-ui, -apple-system, sans-serif`;
-    ctx.fillText('GUARANTEED BY CENTRAL AUTHORITY', noteW / 2 - 24 * scale, -noteH / 2 + 56 * scale);
-
-    ctx.fillStyle = '#fde047';
-    ctx.font = `bold ${15 * scale}px monospace`;
-    ctx.textAlign = 'right';
-    ctx.fillText('7AB 938210', noteW / 2 - 24 * scale, noteH / 2 - 28 * scale);
-
+    ctx.scale(enterProg * noteProg, enterProg * noteProg);
+    drawIndianBanknote(
+      ctx,
+      cx,
+      cy + yOffset,
+      noteW,
+      noteH,
+      denom,
+      config.primaryColor,
+      config.secondaryColor,
+      rot,
+      `4LK 9821${i}4`
+    );
     ctx.restore();
   }
 
+  // Bottom Title Banner
   const titleProg = windowProgress(progress, 0.35, 0.55, Easing.easeOutQuart);
   if (titleProg > 0) {
     ctx.save();
-    ctx.translate(cx, cy + noteH / 2 + 80 * scale);
+    ctx.translate(cx, cy + noteH / 2 + 90 * scale);
     ctx.scale(titleProg, titleProg);
 
     ctx.fillStyle = config.textColor || '#ffffff';
-    ctx.font = `900 ${40 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.font = `900 ${44 * scale}px system-ui, -apple-system, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(config.title || 'CASH FLOW EMPIRE', 0, 0);
+    ctx.fillText(config.title || `₹${denom} CURRENCY STACK`, 0, 0);
 
     ctx.fillStyle = config.accentColor || '#38bdf8';
-    ctx.font = `600 ${20 * scale}px system-ui, -apple-system, sans-serif`;
-    ctx.fillText(config.subtitle || 'UNLIMITED LIQUIDITY ON DEMAND', 0, 36 * scale);
+    ctx.font = `bold ${20 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.fillText(config.subtitle || 'AUTHENTIC SPECIMEN SAMPLES • ENTERTAINMENT SUITE', 0, 38 * scale);
     ctx.restore();
   }
 
@@ -870,3 +1143,238 @@ export function renderMoneyNetWorth(rc: RenderContext) {
 
   ctx.restore();
 }
+
+// ==========================================
+// 11. INDIAN NOTE 3D SHOWCASE (INTERACTIVE INSPECTION)
+// ==========================================
+export function renderMoneyIndianNoteShowcase(rc: RenderContext) {
+  const { ctx, width, height, progress, config } = rc;
+  const scale = width / 1920;
+
+  const cx = width / 2;
+  const cy = height / 2 - 25 * scale;
+  const noteW = 680 * scale;
+  const noteH = 310 * scale;
+  const denom = (config.denomination as any) || '2000';
+
+  const enterProg = windowProgress(progress, 0, 0.15, Easing.easeOutBack);
+  const tiltCycle = Math.sin(progress * Math.PI * 2) * 0.08;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(enterProg, enterProg);
+  ctx.translate(-cx, -cy);
+
+  // Background Ambient Glow matching the note's authentic denomination hue
+  const noteInfo = INDIAN_NOTE_STYLES[denom] || INDIAN_NOTE_STYLES['2000'];
+  const glow = ctx.createRadialGradient(cx, cy, 80 * scale, cx, cy, 400 * scale);
+  glow.addColorStop(0, `${noteInfo.baseColor}44`);
+  glow.addColorStop(0.6, `${noteInfo.baseColor}11`);
+  glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 400 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw 3D Tilting Single Note
+  drawIndianBanknote(
+    ctx,
+    cx,
+    cy,
+    noteW,
+    noteH,
+    denom,
+    config.primaryColor,
+    config.secondaryColor,
+    tiltCycle,
+    '7BC 839215'
+  );
+
+  // Bottom Title & Denomination Tag
+  const textProg = windowProgress(progress, 0.25, 0.45, Easing.easeOutQuart);
+  if (textProg > 0) {
+    ctx.save();
+    ctx.translate(cx, cy + noteH / 2 + 75 * scale);
+    ctx.scale(textProg, textProg);
+
+    ctx.fillStyle = config.textColor || '#ffffff';
+    ctx.font = `900 ${42 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(config.title || `INDIAN ₹${denom} SPECIMEN NOTE`, 0, 0);
+
+    ctx.fillStyle = noteInfo.accentGlow;
+    ctx.font = `bold 18 * scale}px monospace`;
+    ctx.fillText(config.subtitle || `${noteInfo.hindiWord} • ${noteInfo.englishWord}`, 0, 34 * scale);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+// ==========================================
+// 12. CASH FANNING / MONEY SPREAD
+// ==========================================
+export function renderMoneyCashFanning(rc: RenderContext) {
+  const { ctx, width, height, progress, config } = rc;
+  const scale = width / 1920;
+
+  const cx = width / 2;
+  const cy = height / 2 + 10 * scale;
+  const noteW = 460 * scale;
+  const noteH = 210 * scale;
+  const denom = (config.denomination as any) || '500';
+
+  const enterProg = windowProgress(progress, 0, 0.15, Easing.easeOutQuart);
+  const fanProg = windowProgress(progress, 0.08, 0.45, Easing.easeOutBack);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(enterProg, enterProg);
+  ctx.translate(-cx, -cy);
+
+  // Fan of 7 Indian notes spreading out from a central hinge
+  const fanCount = 7;
+  for (let i = 0; i < fanCount; i++) {
+    const normalizedIdx = i - (fanCount - 1) / 2; // -3, -2, -1, 0, 1, 2, 3
+    const targetAngle = normalizedIdx * 0.14 * fanProg;
+    const xOffset = normalizedIdx * 45 * scale * fanProg;
+    const yOffset = Math.abs(normalizedIdx) * 12 * scale * fanProg;
+
+    drawIndianBanknote(
+      ctx,
+      cx + xOffset,
+      cy - 40 * scale + yOffset,
+      noteW,
+      noteH,
+      denom,
+      config.primaryColor,
+      config.secondaryColor,
+      targetAngle,
+      `8DL 10482${i}`
+    );
+  }
+
+  // Header Title
+  const textProg = windowProgress(progress, 0.35, 0.55, Easing.easeOutQuart);
+  if (textProg > 0) {
+    ctx.save();
+    ctx.translate(cx, cy + noteH / 2 + 80 * scale);
+    ctx.scale(textProg, textProg);
+
+    ctx.fillStyle = config.textColor || '#ffffff';
+    ctx.font = `900 ${44 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(config.title || '₹ 50,000 CASH SPREAD', 0, 0);
+
+    ctx.fillStyle = config.accentColor || '#38bdf8';
+    ctx.font = `bold ${18 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.fillText(config.subtitle || 'HIGH-ROLLER FINANCES • 100% SPECIMEN ENTERTAINMENT', 0, 36 * scale);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+// ==========================================
+// 13. INDIAN NOTES BUNDLE / WAD OF CASH
+// ==========================================
+export function renderMoneyIndianNotesBundle(rc: RenderContext) {
+  const { ctx, width, height, progress, config } = rc;
+  const scale = width / 1920;
+
+  const cx = width / 2;
+  const cy = height / 2 - 35 * scale;
+  const noteW = 500 * scale;
+  const noteH = 230 * scale;
+  const denom = (config.denomination as any) || '500';
+
+  const enterProg = windowProgress(progress, 0, 0.18, Easing.easeOutBack);
+  const bundleThick = 60 * scale; // 100 notes wad depth
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(enterProg, enterProg);
+  ctx.translate(-cx, -cy);
+
+  // Draw simulated 3D stacked depth (rim layers of 100 notes)
+  const layers = 14;
+  for (let l = layers; l >= 0; l--) {
+    const ly = cy + l * (bundleThick / layers);
+    roundRect(ctx, cx - noteW / 2, ly - noteH / 2, noteW, noteH, 6);
+    ctx.fillStyle = l === 0 ? '#1e293b' : 'rgba(241, 245, 249, 0.85)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Top Note
+  drawIndianBanknote(
+    ctx,
+    cx,
+    cy,
+    noteW,
+    noteH,
+    denom,
+    config.primaryColor,
+    config.secondaryColor,
+    0,
+    '5KR 618924'
+  );
+
+  // Bank Currency Band (White/Gold paper strap wrapping around center of wad)
+  const bandW = 95 * scale;
+  const bandX = cx - bandW / 2;
+  const bandY = cy - noteH / 2 - 2;
+  const bandH = noteH + bundleThick + 4;
+
+  ctx.save();
+  roundRect(ctx, bandX, bandY, bandW, bandH, 4);
+  ctx.fillStyle = '#f8fafc';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+  ctx.shadowBlur = 14;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Band text details (e.g. "100 PIECES / ₹50,000")
+  ctx.fillStyle = '#dc2626';
+  ctx.font = `bold ${10 * scale}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.fillText('100 PCS', cx, cy - 45 * scale);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = `900 ${14 * scale}px system-ui`;
+  const totalWadVal = parseInt(denom, 10) * 100;
+  ctx.fillText(`₹${totalWadVal.toLocaleString('en-IN')}`, cx, cy - 20 * scale);
+
+  ctx.fillStyle = '#475569';
+  ctx.font = `bold ${8 * scale}px monospace`;
+  ctx.fillText('BANK SEALED', cx, cy + 5 * scale);
+  ctx.fillText('PROP / SPECIMEN', cx, cy + 22 * scale);
+  ctx.restore();
+
+  // Bottom Title
+  const textProg = windowProgress(progress, 0.30, 0.50, Easing.easeOutQuart);
+  if (textProg > 0) {
+    ctx.save();
+    ctx.translate(cx, cy + noteH / 2 + bundleThick + 60 * scale);
+    ctx.scale(textProg, textProg);
+
+    ctx.fillStyle = config.textColor || '#ffffff';
+    ctx.font = `900 ${44 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(config.title || `₹${totalWadVal.toLocaleString('en-IN')} CASH BUNDLE`, 0, 0);
+
+    ctx.fillStyle = config.accentColor || '#38bdf8';
+    ctx.font = `bold ${20 * scale}px system-ui, -apple-system, sans-serif`;
+    ctx.fillText(config.subtitle || `100 NOTES OF ₹${denom} • ENTERTAINMENT PROP SAMPLE`, 0, 36 * scale);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+

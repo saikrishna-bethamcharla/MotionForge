@@ -291,9 +291,18 @@ export async function exportVideo(options: ExportOptions): Promise<void> {
           if (progress >= 0.50) trigger('coin_clink2', () => playCoinClink(audioCtx!, audioDest!));
         } else if (templateId === 'money-falling-coins') {
           if (progress >= 0.08) trigger('coin_shower', () => playCoinShower(audioCtx!, audioDest!));
-        } else if (templateId === 'money-banknote-stack') {
-          if (progress >= 0.10) trigger('cash_rustle', () => playCashRustle(audioCtx!, audioDest!));
-          if (progress >= 0.35) trigger('stack_thud', () => playClick(audioCtx!, audioDest!));
+        } else if (templateId === 'money-banknote-stack' || templateId === 'money-indian-notes-bundle') {
+          if (progress >= 0.08) trigger('cash_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.18) trigger('cash_rustle', () => playCashRustle(audioCtx!, audioDest!));
+          if (progress >= 0.38) trigger('bundle_thud', () => playClick(audioCtx!, audioDest!));
+        } else if (templateId === 'money-cash-fanning') {
+          if (progress >= 0.08) trigger('fan_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.16) trigger('fan_rustle1', () => playCashRustle(audioCtx!, audioDest!));
+          if (progress >= 0.30) trigger('fan_rustle2', () => playCashRustle(audioCtx!, audioDest!));
+        } else if (templateId === 'money-indian-note-showcase') {
+          if (progress >= 0.08) trigger('note_whoosh', () => playWhoosh(audioCtx!, audioDest!));
+          if (progress >= 0.22) trigger('note_rustle', () => playCashRustle(audioCtx!, audioDest!));
+          if (progress >= 0.35) trigger('note_chime', () => playStarChime(audioCtx!, audioDest!));
         } else if (templateId === 'money-rupee-title') {
           if (progress >= 0.08) trigger('rupee_whoosh', () => playWhoosh(audioCtx!, audioDest!));
           if (progress >= 0.25) trigger('rupee_sting', () => playSting(audioCtx!, audioDest!));

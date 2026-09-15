@@ -505,13 +505,27 @@ export const Inspector: React.FC<InspectorProps> = ({ config, onChange }) => {
                   {config.denomination !== undefined && (
                     <div>
                       <span className="text-xs text-slate-300 block mb-1">Denomination</span>
-                      <input
-                        type="text"
+                      <select
                         value={config.denomination}
-                        onChange={(e) => onChange({ denomination: e.target.value })}
-                        placeholder="500"
-                        className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
-                      />
+                        onChange={(e) => {
+                          const denom = e.target.value;
+                          let pCol = config.primaryColor;
+                          let sCol = config.secondaryColor;
+                          if (denom === '2000') { pCol = '#db2777'; sCol = '#831843'; }
+                          else if (denom === '500') { pCol = '#475569'; sCol = '#1e293b'; }
+                          else if (denom === '200') { pCol = '#ea580c'; sCol = '#9a3412'; }
+                          else if (denom === '100') { pCol = '#7c3aed'; sCol = '#4c1d95'; }
+                          else if (denom === '50') { pCol = '#0284c7'; sCol = '#075985'; }
+                          onChange({ denomination: denom, primaryColor: pCol, secondaryColor: sCol });
+                        }}
+                        className="w-full bg-slate-800/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      >
+                        <option value="2000">₹2000 (Magenta)</option>
+                        <option value="500">₹500 (Stone Grey)</option>
+                        <option value="200">₹200 (Bright Orange)</option>
+                        <option value="100">₹100 (Lavender)</option>
+                        <option value="50">₹50 (Fluorescent Cyan)</option>
+                      </select>
                     </div>
                   )}
                 </div>

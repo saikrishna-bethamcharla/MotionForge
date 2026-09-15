@@ -155,6 +155,9 @@ const ICONS: Record<string, React.ReactNode> = {
   'money-piggy-bank': <Award className="w-4 h-4 text-cyan-400" />,
   'money-transaction-pill': <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
   'money-net-worth': <Layers className="w-4 h-4 text-amber-400" />,
+  'money-indian-note-showcase': <Banknote className="w-4 h-4 text-pink-400" />,
+  'money-cash-fanning': <Coins className="w-4 h-4 text-orange-400" />,
+  'money-indian-notes-bundle': <Layers className="w-4 h-4 text-emerald-400" />,
 };
 
 export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
